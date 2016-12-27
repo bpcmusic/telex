@@ -18,6 +18,18 @@ The TELEXo (or TXo) is an output expander and the TELEXi (or TXi) is an input ex
 
 Until the TELEX support is merged into the Teletype firmware, you can grab and compile a version of the TT firmware that supports the TELEX modules from this fork: [Teletype Fork Supporting TELEX Modules](https://github.com/bpcmusic/teletype).
 
+## TELEX Firmware
+
+Compiling the TELEX firmware is done using the [Arduino Development Environment](https://www.arduino.cc/en/Main/Software) and a few extensions.
+
+* [Arduino Development Environment](https://www.arduino.cc/en/Main/Software)
+* [Teensy-duino Add-On](https://www.pjrc.com/teensy/td_download.html)
+* [i2c_t3 Library for Teensy](https://forum.pjrc.com/threads/21680-New-I2C-library-for-Teensy3)
+
+Several additional libraries are included in the project due to the Arduino IDE's wonderful linking capabilities.
+
+	IMPORTANT: overclock your Teensy to 120 MHz in the IDE
+
 ## TELEX Command Reference
 
 A markdown file containing the commands supported by the TXo and TXi is located here: [TELEX Command Reference](commands.md).
@@ -40,10 +52,10 @@ These extended features, when combined together, can really push the envelope of
 
 ####Links:
 
-* [Arduino Firmware](software/TELEXo)
-* [Module PCB](hardware/TELEXo/board)
-* [Module BOM](hardware/TELEXo/board/TELEXo-BOM.xlsx)
-* [4HP Module Panel](hardware/TELEXo/panel)
+* [TXo Arduino Firmware](software/TELEXo)
+* [TXo Module PCB](hardware/TELEXo/board)
+* [TXo Module BOM](hardware/TELEXo/board/TELEXo-BOM.xlsx)
+* [TXo 4HP Module Panel](hardware/TELEXo/panel)
 
 ## TELEXi
 
@@ -56,10 +68,10 @@ Each 4HP module adds 4 IN jacks and 4 PARAM knobs.
 
 ####Links:
 
-* [Arduino Firmware](software/TELEXi)
-* [Module PCB](hardware/TELEXi/board)
-* [Module BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
-* [4HP Module Panel](hardware/TELEXi/panel)
+* [TXo Arduino Firmware](software/TELEXi)
+* [TXo Module PCB](hardware/TELEXi/board)
+* [TXo Module BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
+* [TXo 4HP Module Panel](hardware/TELEXi/panel)
 
 ## DIY
 
