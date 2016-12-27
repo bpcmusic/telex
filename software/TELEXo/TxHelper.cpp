@@ -1,4 +1,9 @@
-
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 #include "TxHelper.h"
 #include "fastexp.h"
 #include "Arduino.h"

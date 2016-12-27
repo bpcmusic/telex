@@ -1,3 +1,9 @@
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+
 // debug flag turns on serial debugging over USB
 // this can drastically affect performance of the DAC
 // depending on where you output to serial - so take care when using it

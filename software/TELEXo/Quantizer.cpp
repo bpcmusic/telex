@@ -1,3 +1,9 @@
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 #include "Arduino.h"
 #include "Quantizer.h"
 #include "TxHelper.h"

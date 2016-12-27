@@ -1,3 +1,9 @@
+/*
+ * TELEXi Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 // TELEXo
 
 #define TO 0x60

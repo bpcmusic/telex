@@ -1,3 +1,9 @@
+/*
+ * TELEXi Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 #ifndef TxHelper_h
 #define TxHelper_h
 

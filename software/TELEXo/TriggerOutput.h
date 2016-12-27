@@ -1,3 +1,9 @@
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 #ifndef TriggerOutput_h
 #define TriggerOutput_h
 

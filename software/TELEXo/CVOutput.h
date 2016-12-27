@@ -1,3 +1,9 @@
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 #ifndef CVOutput_h
 #define CVOutput_h
 

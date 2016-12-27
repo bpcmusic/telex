@@ -1,3 +1,9 @@
+/*
+ * TELEXi Eurorack Module
+ * (c) 2016 Brendon Cassidy
+ * MIT License
+ */
+ 
 // debug flag turns on serial debugging over USB
 // #define DEBUG 1
 
