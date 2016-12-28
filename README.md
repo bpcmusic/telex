@@ -84,6 +84,8 @@ The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; da
 
 * [Galapagoose](http://llllllll.co/users/galapagoose/activity) for being an endlessly patient mentor helping get the circuit design and layout sorted. These modules wouldn't exist without his help.
 
+* [Tom Erbe](http://www.soundhack.com/) for teaching me all about this stuff at CalArts back in the dark ages.
+
 * Ezra Buchla and Brian for birthing the beautiful and ambitious Aleph and endowing it with an `II` jack.
 
 * Tom Whitwell of [Music Thing Modular](http://musicthing.co.uk/modular/) and his open sharing of the Teensy 3.1 powered, Bad-Assed [RadioMusic](https://github.com/TomWhitwell/RadioMusic/wiki).
