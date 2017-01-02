@@ -73,6 +73,30 @@ Each 4HP module adds 4 IN jacks and 4 PARAM knobs.
 * [TXo Module BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
 * [TXo 4HP Module Panel](hardware/TELEXi/panel)
 
+
+## Addressing Multiple TELEX Modules
+
+Multiple TELEX modules are addressed using jumpers on the back of the unit. Theoretically, you can have up to eight of each type of unit on the same II bus. The addresses are non-conflicting between module types. For example, if you have one of each module, each would be unit #1 of that type and neither would have any address jumpers set.
+
+The jumpers are oriented vertically and the rows are numbered from top to bottom:
+
+* Row 1
+* Row 2
+* Row 3
+
+Placing jumpers on rows in the following sequence allows you to designate the unit # (which is the binary representation of the rows plus one). X indicates the placement of a jumper.
+
+| Row 1 | Row 2 | Row 3 | Unit # | Inputs/Outputs |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 1 | 1-4 |
+| X | 0 | 0 | 2 | 5-8 |
+| 0 | X | 0 | 3 | 9-12 |
+| X | X | 0 | 4 | 13-16 |
+| 0 | 0 | X | 5 | 17-20 |
+| X | 0 | X | 6 | 21-24 |
+| 0 | X | X | 7 | 25-28 |
+| X | X | X | 8 | 28-32 |
+
 ## DIY
 
 The modules are made up with two boards stacked on top of each other and a Teensy 3.2 riding piggyback. They are primarily 603 SMD parts with a few 805, 1206 and SMD ICs thrown in for good measure. If you have assembled any of mxmxmx’s DIY modules (Ornament + Crime, Terminal Tedium, etc.) you should have no problem with the expanders. They are not, however, a beginners project for SMD.
