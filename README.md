@@ -32,7 +32,12 @@ Several additional libraries are included in the project due to the Arduino IDE'
 
 ## TELEX Command Reference
 
-A markdown file containing the commands supported by the TXo and TXi is located here: [TELEX Command Reference](commands.md).
+Reference documents for the commands supported by the TXo and TXi are located here:
+
+* [Markdown Command Reference with Extra Descriptions](commands.md)
+* [Printable Command Reference](extras/TELEX Command Reference.pdf)
+
+
 
 ## TELEXo
 

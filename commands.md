@@ -1,12 +1,20 @@
 #TELEX Command Reference
 
-This document outlines the commands for the open source Teletype Expanders TELEXo and TELEXi.
+This document outlines the commands for the open source Teletype Expanders TELEXo and TELEXi. You can also use this [Printable Command Reference](extras/TELEX Command Reference.pdf).
 
 ####Changelog
+
+The version history of this document.
+
+**Revision v.13c** - 7 January 2017
+
+* changed the extended commands for TIME and SLEW to use a period (.) to delimit the seconds and minutes extensions. For example: TO.TR.TIME.S
+* reduced the size of the CALLIBRATE to CALIB command for the TXo
 
 **Revision v.13b** - 16 December 2016
 
 * first version of the command reference document
+
 
 ####Notes
 
@@ -34,8 +42,21 @@ TO.TR.POL 1-n &alpha; | polarity for TO.TR.PULSE set to &alpha; (0-1)
 
 Command  | Description 
 ------------- | ------------- 
-TO.TR.TIMES 1-n &alpha; | time for TR.PULSE; &alpha; in seconds
-TO.TR.TIMEM 1-n &alpha; | time for TR.PULSE; &alpha; in minutes
+TO.TR.TIME.S 1-n &alpha; | time for TR.PULSE; &alpha; in seconds
+TO.TR.TIME.M 1-n &alpha; | time for TR.PULSE; &alpha; in minutes
+
+<!---
+####TXo Trigger Output (TR) Experimental Commands - Pulse Divider + Metronomes
+
+Command  | Description 
+------------- | ------------- 
+TO.TR.PULSE.DIV 1-n &alpha; | pulse divider for TR output; &alpha; in # of pulses
+TO.TR.M 1-n &alpha; | time for TR.M; &alpha; in milliseconds
+TO.TR.M.S 1-n &alpha; | time for TR.M; &alpha; in seconds
+TO.TR.M.M 1-n &alpha; | time for TR.M; &alpha; in minutes
+TO.TR.M.ACT 1-n &alpha; | activates the metronome for the TR output; &alpha; (0 = off; 1 = on)
+TO.TR.M.SYNC 1-n | synchronizes the metronome on the device #
+--->
 
 ####TXo Control Voltage (CV) Basic Commands
 
@@ -51,8 +72,8 @@ TO.CV.OFF 1-n &alpha; | CV offset; &alpha; added at final stage
 
 Command  | Description 
 ------------- | ------------- 
-TO.CV.SLEWS 1-n &alpha; | CV slew time; &alpha; in seconds
-TO.CV.SLEWM 1-n &alpha; | CV slew time; &alpha; in minutes
+TO.CV.SLEW.S 1-n &alpha; | CV slew time; &alpha; in seconds
+TO.CV.SLEW.M 1-n &alpha; | CV slew time; &alpha; in minutes
 TO.CV.QT 1-n &alpha; | CV target &alpha;; quantized to output's current CV.SCALE
 TO.CV.QT.SET 1-n &alpha; | set CV to &alpha;; quantized to output's current CV.SCALE; ignoring SLEW
 TO.CV.N 1-n &alpha; | CV target note # &alpha; in output's current CV.SCALE
@@ -80,8 +101,8 @@ TO.OSC.SYNC 1-n | resets the phase of the oscillator to zero
 TO.OSC.WIDTH 1-n &alpha; | sets the width of the pulse  wave (3) to &alpha; (0 to 100)
 TO.OSC.RECT 1-n &alpha; | rectifies the polarity of the oscillator to &alpha; (-2 to 2); see rectification reference
 TO.OSC.SLEW 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (milliseconds)
-TO.OSC.SLEWS 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (seconds)
-TO.OSC.SLEWM 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (minutes)
+TO.OSC.SLEW.S 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (seconds)
+TO.OSC.SLEW.M 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (minutes)
 TO.OSC.SCALE 1-n &alpha; | sets the quantization scale for the oscillator to scale # &alpha; (listed below)
 
 ####TXo Control Voltage (CV) Experimental Commands - Envelope Generator
@@ -92,11 +113,11 @@ Command  | Description
 ------------- | ------------- 
 TO.ENV.ACT 1-n &alpha; | activates the envelope generator for the CV output; &alpha; (0 = off; 1 = on)
 TO.ENV.ATT 1-n &alpha; | attack time for the envelope; &alpha; in milliseconds
-TO.ENV.ATTS 1-n &alpha; | attack time for the envelope; &alpha; in seconds 
-TO.ENV.ATTM 1-n &alpha; | attack time for the envelope; &alpha; in minutes
+TO.ENV.ATT.S 1-n &alpha; | attack time for the envelope; &alpha; in seconds 
+TO.ENV.ATT.M 1-n &alpha; | attack time for the envelope; &alpha; in minutes
 TO.ENV.DEC 1-n &alpha; | decay time for the envelope; &alpha; in milliseconds 
-TO.ENV.DECS 1-n &alpha; | decay time for the envelope; &alpha; in seconds
-TO.ENV.DECM 1-n &alpha; | decay time for the envelope; &alpha; in minutes
+TO.ENV.DEC.S 1-n &alpha; | decay time for the envelope; &alpha; in seconds
+TO.ENV.DEC.M 1-n &alpha; | decay time for the envelope; &alpha; in minutes
 TO.ENV.TRIG 1-n | triggers the envelope to play
 
 ####TXo Global Commands
@@ -137,7 +158,7 @@ TI.IN.QT 1-n | return the quantized value for the IN jack; uses input's IN.SCALE
 TI.IN.N 1-n | return the quantized note number for the IN jack; uses the input's IN.SCALE
 TI.IN.SCALE 1-n &alpha; | sets the current scale for the input to &alpha;; see scale reference below
 TI.PARAM.QT 1-n | return the quantized value for the PARAM knob; uses knob's PARAM.SCALE
-TI.PARAM.N 1-n | return the quantized value for the PARAM knob; uses knob's PARAM.SCALE
+TI.PARAM.N 1-n | return the quantized note number for the PARAM knob; uses knob's PARAM.SCALE
 TI.PARAM.SCALE 1-n &alpha; | sets the current scale for the param knob to &alpha;; see scale reference below
 
 ####TXi Experimental Commands
@@ -148,8 +169,8 @@ The calibration settings allow you to scale your input values for the IN jacks a
 
 Command  | Description 
 ------------- | ------------- 
-TI.IN.CALIBRATE 1-n &alpha; | calibrates the scaling for the IN jack; see calibration details below
-TI.PARAM.CALIBRATE 1-n &alpha; | calibrates the scaling for the PARAM knob; see calibration details below
+TI.IN.CALIB 1-n &alpha; | calibrates the scaling for the IN jack; see calibration details below
+TI.PARAM.CALIB 1-n &alpha; | calibrates the scaling for the PARAM knob; see calibration details below
 TI.STORE 1-x | stores the calibration data for the expander to its flash memory
 TI.RESET 1-x | resets the calibration data to factory defaults
 
