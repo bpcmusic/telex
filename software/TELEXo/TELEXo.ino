@@ -131,7 +131,7 @@ void setup() {
   kTime = millis() + LEDRATE;
   
   // initialize the teensy optimized wire library
-  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_2400);
+  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
 
   
