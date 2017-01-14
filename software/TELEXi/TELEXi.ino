@@ -110,7 +110,7 @@ void setup() {
 
   // put in a little pullup every few devices
   // i2c_pullup pullup = (cfg % 2) == 0 ? I2C_PULLUP_EXT : I2C_PULLUP_INT;
-  i2c_pullup pullup = I2C_PULLUP_INT;
+  i2c_pullup pullup = I2C_PULLUP_EXT;
   
   
   // enable i2c and connect the event callbacks
