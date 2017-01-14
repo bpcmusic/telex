@@ -117,9 +117,9 @@ The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; da
 * [TXi Gerbers Bottom](hardware/TELEXi/board/gerbers/TI-BOT 1.1A.zip)
 * [TXi BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
 * [TXi Bottom Top Build Map](hardware/TELEXi/board/build_map/bt/txi_bt_build_map.pdf)
-* [TXi Bottom Bottom Build Map](hardware/TELEXi/board/build_map/bt/txi_bb_build_map.pdf)
-* [TXi Top Top Build Map](hardware/TELEXi/board/build_map/bt/txi_tt_build_map.pdf)
-* [TXi Top Bottom Build Map](hardware/TELEXi/board/build_map/bt/txi_tb_build_map.pdf)
+* [TXi Bottom Bottom Build Map](hardware/TELEXi/board/build_map/bb/txi_bb_build_map.pdf)
+* [TXi Top Top Build Map](hardware/TELEXi/board/build_map/tt/txi_tt_build_map.pdf)
+* [TXi Top Bottom Build Map](hardware/TELEXi/board/build_map/tb/txi_tb_build_map.pdf)
 * [TXi Panel Files](hardware/TELEXi/panel)
 
 ###TXo Build Files
@@ -131,9 +131,9 @@ The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; da
 * [TXo Gerbers Bottom](hardware/TELEXo/board/gerbers/TO-BOT-1.1.zip)
 * [TXo BOM](hardware/TELEXo/board/TELEXo-BOM.xlsx)
 * [TXo Bottom Top Build Map](hardware/TELEXo/board/build_map/bt/txo_bt_build_map.pdf)
-* [TXo Bottom Bottom Build Map](hardware/TELEXo/board/build_map/bt/txo_bb_build_map.pdf)
-* [TXo Top Top Build Map](hardware/TELEXo/board/build_map/bt/txo_tt_build_map.pdf)
-* [TXo Top Bottom Build Map](hardware/TELEXo/board/build_map/bt/txo_tb_build_map.pdf)
+* [TXo Bottom Bottom Build Map](hardware/TELEXo/board/build_map/bb/txo_bb_build_map.pdf)
+* [TXo Top Top Build Map](hardware/TELEXo/board/build_map/tt/txo_tt_build_map.pdf)
+* [TXo Top Bottom Build Map](hardware/TELEXo/board/build_map/tb/txo_tb_build_map.pdf)
 * [TXo Panel Files](hardware/TELEXo/panel)
 
 ## Thanks
