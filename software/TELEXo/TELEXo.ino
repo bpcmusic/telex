@@ -129,9 +129,13 @@ void setup() {
   // start the write timer
   writeTimer.begin(writeOutputs, writeRate);
   kTime = millis() + LEDRATE;
+
+  // put in a little pullup every few devices
+  // i2c_pullup pullup = (cfg % 2) == 0 ? I2C_PULLUP_EXT : I2C_PULLUP_INT;
+  i2c_pullup pullup = I2C_PULLUP_INT;
   
   // initialize the teensy optimized wire library
-  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
+  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, pullup, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
 
   

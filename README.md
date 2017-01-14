@@ -108,6 +108,34 @@ The modules are made up with two boards stacked on top of each other and a Teens
 
 The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; datasheet: http://www.ti.com/product/DAC8564). This part is used by a number of Eurorack modules - including Mutable's *Yarns* and *Ornament + Crime* by mxmxmx. It has tiny little SMD legs that can cause DIY cursing. ;)
 
+###TXi Build Files
+
+[Explore the repository for all kinds of support files](hardware/TELEXi). Here are some of the key ones:
+
+* [TXi Schematic](hardware/TELEXi/board/Telex-I Schematic.pdf)
+* [TXi Gerbers Top](hardware/TELEXi/board/gerbers/TI-TOP-1.1.zip)
+* [TXi Gerbers Bottom](hardware/TELEXi/board/gerbers/TI-BOT 1.1A.zip)
+* [TXi BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
+* [TXi Bottom Top Build Map](hardware/TELEXi/board/build_map/bt/txi_bt_build_map.pdf)
+* [TXi Bottom Bottom Build Map](hardware/TELEXi/board/build_map/bt/txi_bb_build_map.pdf)
+* [TXi Top Top Build Map](hardware/TELEXi/board/build_map/bt/txi_tt_build_map.pdf)
+* [TXi Top Bottom Build Map](hardware/TELEXi/board/build_map/bt/txi_tb_build_map.pdf)
+* [TXi Panel Files](hardware/TELEXi/panel)
+
+###TXo Build Files
+
+[Explore the repository for all kinds of support files](hardware/TELEXo). Here are some of the key ones:
+
+* [TXo Schematic](hardware/TELEXo/board/Telex-O Schematic.pdf)
+* [TXo Gerbers Top](hardware/TELEXo/board/gerbers/TO-TOP-1.1.zip)
+* [TXo Gerbers Bottom](hardware/TELEXo/board/gerbers/TO-BOT-1.1.zip)
+* [TXo BOM](hardware/TELEXo/board/TELEXo-BOM.xlsx)
+* [TXo Bottom Top Build Map](hardware/TELEXo/board/build_map/bt/txo_bt_build_map.pdf)
+* [TXo Bottom Bottom Build Map](hardware/TELEXo/board/build_map/bt/txo_bb_build_map.pdf)
+* [TXo Top Top Build Map](hardware/TELEXo/board/build_map/bt/txo_tt_build_map.pdf)
+* [TXo Top Bottom Build Map](hardware/TELEXo/board/build_map/bt/txo_tb_build_map.pdf)
+* [TXo Panel Files](hardware/TELEXo/panel)
+
 ## Thanks
 * Brian Crabtree and Kelli Cain for creating [Monome](http://monome.org) and their awesome, open Eurorack modules (including the Teletype which started this all).
 
