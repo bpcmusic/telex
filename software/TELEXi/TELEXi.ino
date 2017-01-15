@@ -21,6 +21,9 @@
  * Ugly Globals
  */
 
+// i2c pullup setting
+bool enablePullups = false;
+
 // config inputs
 int configPins[] = { 2, 1, 0 };
 int configID = TI;
@@ -108,13 +111,8 @@ void setup() {
   // start the read timer
   readTimer.begin(readInputs, 500);
 
-  // put in a little pullup every few devices
-  // i2c_pullup pullup = (cfg % 2) == 0 ? I2C_PULLUP_EXT : I2C_PULLUP_INT;
-  i2c_pullup pullup = I2C_PULLUP_EXT;
-  
-  
   // enable i2c and connect the event callbacks
-  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, pullup, I2C_RATE_400); // I2C_RATE_2400 // I2C_PULLUP_EXT
+  Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400 // I2C_PULLUP_EXT
   Wire.onReceive(receiveEvent);  
   Wire.onRequest(requestEvent);
 
@@ -251,8 +249,8 @@ void actOnCommand(byte cmd, byte out, int value){
       quant[io.Port]->SetScale(value);
       break;
 
-    case TI_IN_CALIBRATE:    
-    case TI_PARAM_CALIBRATE:
+    case TI_IN_CALIB:    
+    case TI_PARAM_CALIB:
       analogReaders[io.Port]->Calibrate(value);
       break;    
 

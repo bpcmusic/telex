@@ -1,6 +1,8 @@
 $fn = 50;
 
-// TXi
+// TXo Bottom
+
+tolerance = .5;
 
 pcbX = 19.68;
 pcbY = 107.01;
@@ -15,7 +17,7 @@ barTwoStart = 71;
 barTwoEnd = 77;
 
 barThreeStart = 102;
-barThreeEnd = 107.01;
+barThreeEnd = 107.01 + (tolerance / 2);
 
 corner = 2.5;
 
@@ -25,17 +27,18 @@ difference(){
         difference() {
             translate([-frame, - frame, 0])
                 cube([pcbX + 2 * frame, pcbY + 2 * frame, 2 * pcbZ]);
-            cube([pcbX, pcbY, 2 * pcbZ]);
+            translate([-tolerance/2, -tolerance/2, 0])
+                cube([pcbX + tolerance, pcbY + tolerance, 2 * pcbZ]);
         }
 
-        translate([0, barOneStart, 0])
-            cube([pcbX, barOneEnd - barOneStart, pcbZ]);
+        translate([-tolerance/2, barOneStart-(tolerance/2), 0])
+            cube([pcbX + tolerance, barOneEnd - barOneStart -tolerance, pcbZ]);
             
-        translate([0, barTwoStart, 0])
-            cube([pcbX, barTwoEnd - barTwoStart, pcbZ]);
+        translate([-tolerance/2, barTwoStart, 0])
+            cube([pcbX + tolerance, barTwoEnd - barTwoStart, pcbZ]);
         
-        translate([0, barThreeStart, 0])
-            cube([pcbX, barThreeEnd - barThreeStart, pcbZ]);
+        translate([-tolerance/2, barThreeStart, 0])
+            cube([pcbX + tolerance, barThreeEnd - barThreeStart, pcbZ]);
 
     }
 

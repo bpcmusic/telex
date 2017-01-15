@@ -4,7 +4,10 @@
  * MIT License
  */
  
-// TELEXo
+#ifndef _OPS_TELEX_H_
+#define _OPS_TELEX_H_
+ 
+ // TELEXo
 
 #define TO 0x60
 #define TO_0 0x60
@@ -21,18 +24,24 @@
 #define TO_TR 0x00
 #define TO_TR_TOG 0x01
 #define TO_TR_TIME 0x02
-#define TO_TR_TIMES 0x03
-#define TO_TR_TIMEM 0x04
+#define TO_TR_TIME_S 0x03
+#define TO_TR_TIME_M 0x04
 #define TO_TR_PULSE 0x05
 #define TO_TR_POL 0x06
-#define TO_TR_M 0x07
-#define TO_TR_M_ACT 0x08
+
+#define TO_TR_PULSE_DIV 0x07
+#define TO_TR_M 0x08
+#define TO_TR_M_S 0x09
+#define TO_TR_M_M 0x0A
+#define TO_TR_M_BPM 0x0B
+#define TO_TR_M_ACT 0x0C
+#define TO_TR_SYNC 0x0D
 
 #define TO_CV 0x10
 #define TO_CV_SET 0x11
 #define TO_CV_SLEW 0x12
-#define TO_CV_SLEWS 0x13
-#define TO_CV_SLEWM 0x14
+#define TO_CV_SLEW_S 0x13
+#define TO_CV_SLEW_M 0x14
 #define TO_CV_OFF 0x15
 
 #define TO_KILL 0x20
@@ -60,17 +69,17 @@
 #define TO_OSC_RECT 0x4D
 #define TO_OSC_SCALE 0x4E
 #define TO_OSC_SLEW 0x4F
-#define TO_OSC_SLEWS 0x50
-#define TO_OSC_SLEWM 0x51
+#define TO_OSC_SLEW_S 0x50
+#define TO_OSC_SLEW_M 0x51
 #define TO_OSC_TR_ACT 0x52
 
 #define TO_ENV_ACT 0x60
 #define TO_ENV_ATT 0x61
-#define TO_ENV_ATTS 0x62
-#define TO_ENV_ATTM 0x63
+#define TO_ENV_ATT_S 0x62
+#define TO_ENV_ATT_M 0x63
 #define TO_ENV_DEC 0x64
-#define TO_ENV_DECS 0x65
-#define TO_ENV_DECM 0x66
+#define TO_ENV_DEC_S 0x65
+#define TO_ENV_DEC_M 0x66
 #define TO_ENV_TRIG 0x67
 #define TO_ENV_CYC 0x68
 #define TO_ENV_BPOL 0x69
@@ -99,7 +108,9 @@
 #define TI_PARAM_N 0x12
 #define TI_PARAM_SCALE 0x13
 
-#define TI_IN_CALIBRATE 0x20
-#define TI_PARAM_CALIBRATE 0x21
+#define TI_IN_CALIB 0x20
+#define TI_PARAM_CALIB 0x21
 #define TI_STORE 0x22
 #define TI_RESET 0x23
+
+#endif
