@@ -269,13 +269,6 @@ void actOnCommand(byte cmd, byte out, int value){
       cvOutputs[targetOutput]->SetOffset(value);
       break;
 
-/*
-    case TO_CV_FORMAT:
-      // Set Pulse Time Format Trigger
-      cvOutputs[targetOutput]->SetTimeFormat(value);
-      break;
-*/
-
     case TO_CV_QT:
       // Set Pulse Time Format Trigger
       cvOutputs[targetOutput]->TargetQuantizedValue(value);
@@ -300,7 +293,6 @@ void actOnCommand(byte cmd, byte out, int value){
       // Set Pulse Time Format Trigger
       cvOutputs[targetOutput]->SetQuantizationScale(value);
       break;
-
 
     case TO_OSC:
       cvOutputs[targetOutput]->TargetVOct(value);
@@ -461,6 +453,41 @@ void actOnCommand(byte cmd, byte out, int value){
     case TO_TR_POL:
        // Set the Trigger's Polarity
       triggerOutputs[targetOutput]->SetPolarity(value != 0); 
+      break;
+
+    case TO_TR_PULSE_DIV:
+      // Set Clock Divider
+      triggerOutputs[targetOutput]->SetDivision(value);
+      break;
+
+    case TO_TR_M_ACT:
+      // Set Clock Divider
+      triggerOutputs[targetOutput]->SetMetro(value);
+      break;
+
+    case TO_TR_M:
+       // Set Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->SetMetroTime(value, 0);    
+      break;
+      
+    case TO_TR_M_S:
+       // Set Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->SetMetroTime(value, 1);    
+      break;
+      
+    case TO_TR_M_M:
+       // Set Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->SetMetroTime(value, 2);    
+      break;
+        
+    case TO_TR_M_BPM:
+       // Set Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->SetMetroTime(value, 3);    
+      break;
+              
+    case TO_TR_M_SYNC:
+       // Sync Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->Sync();    
       break;
 
     case TO_KILL:

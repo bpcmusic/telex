@@ -35,7 +35,7 @@
 #define TO_TR_M_M 0x0A
 #define TO_TR_M_BPM 0x0B
 #define TO_TR_M_ACT 0x0C
-#define TO_TR_SYNC 0x0D
+#define TO_TR_M_SYNC 0x0D
 
 #define TO_CV 0x10
 #define TO_CV_SET 0x11

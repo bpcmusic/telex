@@ -6,6 +6,10 @@ This document outlines the commands for the open source Teletype Expanders TELEX
 
 The version history of this document.
 
+**Revision v.13p** - 14 January 2017
+
+* added the extended commands for TO.TR; four independent metronomes and pulse dividers
+
 **Revision v.13c** - 7 January 2017
 
 * changed the extended commands for TIME and SLEW to use a period (.) to delimit the seconds and minutes extensions. For example: TO.TR.TIME.S
@@ -45,8 +49,8 @@ Command  | Description
 TO.TR.TIME.S 1-n &alpha; | time for TR.PULSE; &alpha; in seconds
 TO.TR.TIME.M 1-n &alpha; | time for TR.PULSE; &alpha; in minutes
 
-<!---
-####TXo Trigger Output (TR) Experimental Commands - Pulse Divider + Metronomes
+
+####TXo Trigger Output (TR) Experimental Commands - Divider + Metronomes
 
 Command  | Description 
 ------------- | ------------- 
@@ -54,9 +58,10 @@ TO.TR.PULSE.DIV 1-n &alpha; | pulse divider for TR output; &alpha; in # of pulse
 TO.TR.M 1-n &alpha; | time for TR.M; &alpha; in milliseconds
 TO.TR.M.S 1-n &alpha; | time for TR.M; &alpha; in seconds
 TO.TR.M.M 1-n &alpha; | time for TR.M; &alpha; in minutes
-TO.TR.M.ACT 1-n &alpha; | activates the metronome for the TR output; &alpha; (0 = off; 1 = on)
+TO.TR.M.BPM 1-n &alpha; | time for TR.M; &alpha; in Beats Per Minute
+TO.TR.M.ACT 1-n &alpha; | activates the metronome for the TR output; &alpha; (0=off; 1=on)
 TO.TR.M.SYNC 1-n | synchronizes the metronome on the device #
---->
+
 
 ####TXo Control Voltage (CV) Basic Commands
 

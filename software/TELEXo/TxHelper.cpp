@@ -74,6 +74,12 @@ unsigned long TxHelper::ConvertMs(unsigned long ms, short format){
     case 2:
       ms *= 60000;
       break;
+
+    // bpm
+    case 3:
+      ms = 60000 / ms;
+      break;
+      
   }
 
   return ms;

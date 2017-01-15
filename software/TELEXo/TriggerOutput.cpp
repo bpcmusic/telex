@@ -48,6 +48,15 @@ void TriggerOutput::ToggleState(){
  * Pulse the Trigger for the Time Interval
  */
 void TriggerOutput::Pulse() {
+
+  // implement the clock divider (if active)
+  if (_divide) {
+    if (++_counter >= _division)
+      _counter = 0;
+    else
+      return; 
+  }
+  
   if (_state != _polarity)
     SetState(_polarity);
   _toggle = millis() + _pulseTime;
@@ -61,21 +70,64 @@ void TriggerOutput::SetPolarity(bool polarity){
 }
 
 /*
+ * Sets the division value for the PULSE clock divider
+ */
+void TriggerOutput::SetDivision(int division){
+  _division = division;
+  _counter = _division;
+  _divide = division > 1 ? true : false;
+}
+
+/**
+ * Activates or Deactivates the Metro for this Trigger
+ */
+void TriggerOutput::SetMetro(int state){
+  bool m = state != 0;
+  if (m && !_metro) Sync();
+  _metro = m;
+}
+
+/**
+ * Sets the time for the metro pulse (in ms, sec, min, and bpm)
+ */
+void TriggerOutput::SetMetroTime(int value, short format){
+  _metroInterval = TxHelper::ConvertMs(value, format);
+}
+
+/**
+ * Syncs the metro pulse to now
+ */
+void TriggerOutput::Sync(){
+  _nextEvent = millis();
+}
+
+
+/*
  * Stop All Pulses
  */
 void TriggerOutput::Kill(){
   _toggle = MAXTIME;
+  _metro = false;
 }
 
 /*
  * Update Function (Call This a Lot)
  */
 void FASTRUN TriggerOutput::Update(unsigned long currentTime){
+
+  // turn off the pulse
   if (currentTime >= _toggle) {
     if (_state == _polarity)
       SetState(!_polarity);
     _toggle = MAXTIME;
   }
+
+  // evaluate pinging the metro event
+  if (_metro && currentTime >= _nextEvent){
+    _nextEvent = currentTime + _metroInterval;
+    Pulse();
+  }
+  
 }
 
 
