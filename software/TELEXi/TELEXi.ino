@@ -5,7 +5,7 @@
  */
  
 // debug flag turns on serial debugging over USB
-// #define DEBUG 1
+#define DEBUG 1
 
 // i2c Wire library (for Teensy)
 #include <i2c_t3.h>

@@ -42,8 +42,9 @@ class Oscillator
     void SetWidth(int width);
     void SetRectify(int mode);
 
-
     void SetPortamentoMs(unsigned long milliseconds);
+
+    float GetFrequency();
     
   protected:
 
@@ -62,7 +63,7 @@ class Oscillator
 
   int _table = 0;
 
-  unsigned long _frequency = 0;
+  float _frequency = 0;
   unsigned long _ulphase = 0;
   unsigned long _ulstep = 0;
   unsigned long _oldulphase = 0;

@@ -32,7 +32,10 @@ void CVOutput::SetValue(int value){
   // target is the delivered value plus the configured offset
   _tempTarget = Constrain(value + _offset) << 15;
   if (_envelopeMode){
-    _envTarget = _tempTarget;
+    if (_envTarget != _tempTarget) {
+      _envTarget = _tempTarget;
+      RecomputeEnvelopes();
+    }
   } else {
     _target = _tempTarget;
     // this boolean tells the update method to skip slewing
@@ -47,7 +50,10 @@ void CVOutput::TargetValue(int value){
   // target is the delivered value plus the configured offset
   _tempTarget = Constrain(value + _offset) << 15;
   if (_envelopeMode){
-    _envTarget = _tempTarget;
+    if (_envTarget != _tempTarget) {
+      _envTarget = _tempTarget;
+      RecomputeEnvelopes();
+    }
   } else {
     _target = _tempTarget;
     // false indicates that we want it to slew
@@ -80,7 +86,10 @@ void CVOutput::SetOffset(int value){
   _lOffset = _offset << 15;
   
   if (_envelopeMode){
-    _envTarget = _tempTarget;
+    if (_envTarget != _tempTarget) {
+      _envTarget = _tempTarget;
+      RecomputeEnvelopes();
+    }
   } else {
     _target = _tempTarget;
      // if slewing - calculate a new slew value
@@ -155,6 +164,9 @@ void CVOutput::SetTimeFormat(int format){
   // Output::SetTimeFormat(format);
 }
 
+/*
+ * Sets the oscillation frequency in Hz
+ */
 void CVOutput::SetFrequency(int freq){
 
   if (!_oscilMode)
@@ -168,6 +180,9 @@ void CVOutput::SetFrequency(int freq){
     _set = true;
 }
 
+/*
+ * Targets the oscillation frequency in Hz (for slew)
+ */
 void CVOutput::TargetFrequency(int freq){
 
   if (!_oscilMode)
@@ -181,6 +196,10 @@ void CVOutput::TargetFrequency(int freq){
     _set = true;
 }
 
+/*
+ * Sets the oscillation frequency using the TT integer value
+ * using the current quantizer scale
+ */
 void CVOutput::SetQuantizedVOct(int value){
 
   if (!_oscilMode)
@@ -195,6 +214,10 @@ void CVOutput::SetQuantizedVOct(int value){
   
 }
 
+/*
+ * Targets the oscillation frequencty using the TT integer value
+ * using the current quantizer scale
+ */
 void CVOutput::TargetQuantizedVOct(int value){
 
   if (!_oscilMode)
@@ -208,13 +231,16 @@ void CVOutput::TargetQuantizedVOct(int value){
     _set = true;
 }
 
-
+/*
+ * Sets the slew amount for the frequency (portamento) in the supplied format
+ */
 void CVOutput::SetFrequencySlew(int slew, short format){
-  Serial.printf("MS: %d", TxHelper::ConvertMs(slew, format));
   _oscillator->SetPortamentoMs(TxHelper::ConvertMs(slew, format));
 }
 
-
+/*
+ * Sets the oscillation frequency using the TT integer value
+ */
 void CVOutput::SetVOct(int value){
   if (!_oscilMode)
     _oscillator->ResetPhase(_target);
@@ -227,6 +253,9 @@ void CVOutput::SetVOct(int value){
     _set = true;
 }
 
+/*
+ * Targets the oscillation frequency using the TT integer value
+ */
 void CVOutput::TargetVOct(int value){
   if (!_oscilMode)
     _oscillator->ResetPhase(_target);
@@ -238,24 +267,44 @@ void CVOutput::TargetVOct(int value){
     _set = true;
 }
 
+/*
+ * Sets the oscillation frequency via note number 
+ * (against the current quantized scale)
+ */
 void CVOutput::SetOscNote(int note){
    _oscilMode = true;
    _oscillator->SetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
 }
 
+/*
+ * Targets the oscillation frequency via note number 
+ * (against the current quantized scale)
+ */
 void CVOutput::TargetOscNote(int note){
    _oscilMode = true;
    _oscillator->TargetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
 }
 
+/*
+ * Sets the pulse width of the square wave waveform
+ */
 void CVOutput::SetWidth(int width){
   _oscillator->SetWidth(width);
 }
 
+/*
+ * Sets the rectification mode (-2 to + 2)
+ * 0 = No Rectification
+ * -1/+1 = Partial Rectification (lops off values on the other side of zero)
+ * -2/+2 = Full Rectification (does an ABS on the waveform and forces polarity)
+ */
 void CVOutput::SetRectify(int mode){
   _oscillator->SetRectify(mode);
 }
 
+/*
+ * Set the oscillator frequency in Millihertz (1 Hz = .001 mHz)
+ */
 void CVOutput::SetLFO(int millihertz){
   if (!_oscilMode)
     _oscillator->ResetPhase(_target);
@@ -268,6 +317,9 @@ void CVOutput::SetLFO(int millihertz){
     _set = true;
 }
 
+/*
+ * Target the oscillator frequency in Millihertz (1 Hz = .001 mHz)
+ */
 void CVOutput::TargetLFO(int millihertz){
   if (!_oscilMode)
     _oscillator->ResetPhase(_target);
@@ -280,6 +332,9 @@ void CVOutput::TargetLFO(int millihertz){
     _set = true;
 }
 
+/*
+ * Resets the phase of the oscillator
+ */
 void CVOutput::Sync(){
   if (_oscilMode)
     _oscillator->ResetPhase(0);
@@ -287,45 +342,81 @@ void CVOutput::Sync(){
     _oscillator->ResetPhase(_target);
 }
 
+/*
+ * Selects the oscillator waveform
+ * 0 = Sine
+ * 1 = Triangle
+ * 2 = Saw
+ * 3 = Square
+ * 4 = Noise / Sample-and-Hold
+ */
 void CVOutput::SetWaveform(int wave){
   _oscillator->SetTable(wave);
 }
 
+/*
+ * Sets the quantization scale based on the included scales 
+ * (see the Quantizer for the list)
+ */
 void CVOutput::SetOscQuantizationScale(int scale){
   _oscQuantizer->SetScale(scale);
 }
 
-
+/*
+ * Sets the attack rate for the envelope generator
+ */
 void CVOutput::SetAttack(int att, short format){
   _attack = TxHelper::ConvertMs(max(att, 1), format);
   _attackSlew = CalculateRawSlew(_attack, _envTarget, _lOffset);
 }
 
+/*
+ * Sets the decay rate for the envelope generator
+ */
 void CVOutput::SetDecay(int dec, short format){
   _decay = TxHelper::ConvertMs(max(dec, 1), format);
   _decaySlew = CalculateRawSlew(_decay, _lOffset, _envTarget);
 }
 
+/*
+ * Turns envelopes on (1) and off (0) and initializes them
+ */
 void CVOutput::SetEnvelopeMode(int mode){
+
+  // thanks to @scanner_darkly for suggesting this bugfix
+  // only want to set the targets if the envelope mode has changed
+  bool eMode = mode != 0;
+  if (eMode != _envelopeMode){
   
-  _envelopeMode = mode != 0;
-  
-  if (_envelopeMode){
+    _envelopeMode = eMode;
     
-    _envTarget = _target;
-    _target = _lOffset;
-    SetAttack(_attack, 0);
-    SetDecay(_decay, 0);
+    if (_envelopeMode){
     
-  } else {
+      _envTarget = _target;
+      _target = _lOffset;
+      RecomputeEnvelopes();
     
-    _target = _envTarget;
+    } else {
     
+      _target = _envTarget;
+    
+    }
+    
+    _set = true;
   }
-  
-  _set = true;
 }
 
+/*
+ * Recomputes the Envlope Values
+ */
+void CVOutput::RecomputeEnvelopes(){
+      SetAttack(_attack, 0);
+      SetDecay(_decay, 0);
+}
+
+/*
+ * Triggers or Retriggers the current envelope
+ */
 void CVOutput::TriggerEnvelope(){
 
   if (_envelopeMode) {
@@ -338,7 +429,7 @@ void CVOutput::TriggerEnvelope(){
       _retrigger = true;
       
     } else {
-      
+            
       _current = _lOffset;
       _target = _envTarget;
       _slew = _attackSlew;
@@ -351,6 +442,7 @@ void CVOutput::TriggerEnvelope(){
    
 /*
  * The Update Function to Fulfil the Virtual Requirement
+ * Keep it Lean - You Don't have Much CPU
  */
 void FASTRUN CVOutput::Update() {
 
@@ -406,17 +498,17 @@ void FASTRUN CVOutput::Update() {
     _updateLED = true;
     
   } else if (_oscilMode) { 
-
-    // just update the dac (for oscil - no LED change)
-    UpdateDAC(_smallCurrent);
     
+    // just update the dac
+    UpdateDAC(_smallCurrent);
+
   }
 
 }
 
-
 /*
  * Update the DAC
+ * Keep it Very Lean - Hardly Any CPU to Spare!
  */
 void FASTRUN CVOutput::UpdateDAC(int value){
 
@@ -424,9 +516,9 @@ void FASTRUN CVOutput::UpdateDAC(int value){
   if (_oscilMode)
     value = (int)(value * (_oscillator->Oscillate() / 32768.));
   
-  _cvHelper = 32767 - value;
+  _cvHelper = value;
   
-  _dac.writeChannel(_output, _cvHelper);  
+  _dac.writeChannel(_output, (32767 - _cvHelper));  
   
 }
 
@@ -434,10 +526,11 @@ void FASTRUN CVOutput::UpdateDAC(int value){
  * Update the LED (runs at a slower rate than the DAC)
  */
 void CVOutput::UpdateLED() {
-  if (_updateLED){
+  // update the LED if changed OR the frequency rate is < 1 Hz
+  if (_updateLED || (_oscilMode && _oscillator->GetFrequency() <= 1)){
     _updateLED = false;
     // calculate the LED value and update it
-    _ledHelper = abs(_current) >> 22;
+    _ledHelper = _oscilMode ? abs(_cvHelper) >> 7 : abs(_current) >> 22;
     analogWrite(_led, _ledHelper);
   }
 }

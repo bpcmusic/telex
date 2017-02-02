@@ -79,10 +79,13 @@ float Oscillator::Oscillate() {
 }
 
 void Oscillator::SetFreq(float freq){
+  _frequency = freq;
   _portamento = false;
   _ulstep = (int)((freq / _samplingRate) * FULLPHASE);
 }
+
 void Oscillator::TargetFreq(float freq){
+  _frequency = freq;
   if (_stepsCalculated == 0){
     SetFreq(freq);
   } else {
@@ -165,6 +168,10 @@ void Oscillator::SetPortamentoMs(unsigned long milliseconds){
       }
     _steps = _stepsCalculated;
   }
+}
+
+float Oscillator::GetFrequency(){
+  return _frequency;
 }
 
 // tables

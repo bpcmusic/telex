@@ -83,6 +83,8 @@ class CVOutput : public Output
     
   private:
 
+    void RecomputeEnvelopes();
+
     int _samplingRate = 20000;
     int _krate = 20;
 

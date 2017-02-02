@@ -28,9 +28,17 @@ difference(){
                 cube([pcbX + tolerance, pcbY + tolerance, 2 * pcbZ]);
         }
 
+/*
         translate([-tolerance/2, barOneStart - (tolerance/2), 0])
             cube([pcbX + tolerance, barOneEnd - barOneStart, pcbZ]);
-            
+*/
+
+        translate([-tolerance/2,-tolerance/2,0])
+            cube([corner, corner, pcbZ]);
+
+        translate([pcbX - corner + (tolerance / 2), -tolerance/2, 0])
+            cube([corner, corner, pcbZ]);
+        
         translate([-tolerance/2, barTwoStart, 0])
             cube([pcbX + tolerance, barTwoEnd - barTwoStart, pcbZ]);
 
