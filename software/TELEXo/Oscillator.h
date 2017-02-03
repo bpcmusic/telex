@@ -13,8 +13,8 @@
 #define TABLERANGEDIV2 256
 #define TABLESIZE 513
 #define TABLECOUNT 3
-#define TABLECOUNTPLUSONE 4
 #define WAVEFORMS 5
+#define MORPHRANGE 1000
 
 #define TABLEBITS 9
 #define REDUCEBITS 23 // 32 - TABLEBITS
@@ -37,7 +37,7 @@ class Oscillator
     void SetLFO(int millihertz);
     void TargetLFO(int millihertz);
 
-    void SetTable(int table);
+    void SetWaveform(int wave);
     void ResetPhase(long polarity);
     void SetWidth(int width);
     void SetRectify(int mode);
@@ -61,7 +61,12 @@ class Oscillator
     
   private:
 
-  int _table = 0;
+  int _wave = 0;
+  int _morphWave = 1;
+  int _morph = 0;
+  int _invMorph = MORPHRANGE;
+  bool _morphing = false;
+  int _morphValue = 0;
 
   float _frequency = 0;
   unsigned long _ulphase = 0;

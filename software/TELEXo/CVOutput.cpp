@@ -351,7 +351,7 @@ void CVOutput::Sync(){
  * 4 = Noise / Sample-and-Hold
  */
 void CVOutput::SetWaveform(int wave){
-  _oscillator->SetTable(wave);
+  _oscillator->SetWaveform(wave);
 }
 
 /*
