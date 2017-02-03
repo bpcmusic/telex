@@ -31,16 +31,16 @@ float Oscillator::Oscillate() {
   // reduce this down to meet the tablesize range
   _location = _ulphase >> REDUCEBITS;
    
-  switch(_table){
+  switch(_wave){
     case 0:
     case 1:
     case 2:
-      if (_portamento){
+      if (_portamento || _morphing){
         // no interpolation or rounding
-        _lastValue =  tables[_table][_location];
+        _lastValue =  tables[_wave][_location];
       } else {  
         // interpolate using some fixed math magic (and a floating point scaler)
-        _lastValue = tables[_table][_location] + (_ulphase & PHASEMASK) * _phasescale * (tables[_table][_location + 1] - tables[_table][_location]);
+        _lastValue = tables[_wave][_location] + (_ulphase & PHASEMASK) * _phasescale * (tables[_wave][_location + 1] - tables[_wave][_location]);
       }
       break;
     case 3:
@@ -55,6 +55,26 @@ float Oscillator::Oscillate() {
     default:
       _lastValue =  0;
       break;
+  }
+
+  if (_morphing){
+    switch(_morphWave){
+      case 0:
+      case 1:
+      case 2:
+        _morphValue =  tables[_morphWave][_location];
+        break;
+      case 3:
+        _morphValue =  _location < _width ? -32767 : 32767;
+        break;
+      case 4:
+        if (_ulphase < _oldulphase) _morphValue = random(0, 65536) - 32878.;
+        break;
+      default:
+        _morphValue =  0;
+        break;
+    }
+    _lastValue = (_lastValue * _invMorph + _morphValue * _morph) / MORPHRANGE;
   }
 
   switch(_rectify){
@@ -145,15 +165,20 @@ void Oscillator::SetRectify(int mode) {
   _rectify = constrain(mode, -2, 2);
 }
 
-void Oscillator::SetTable(int table) {
-  _table = constrain(table, 0, TABLECOUNTPLUSONE);
+void Oscillator::SetWaveform(int wave) {
+  _wave = constrain(wave / MORPHRANGE, 0, WAVEFORMS - 1);
+  _morphWave = _wave + 1;
+  if (_morphWave >= WAVEFORMS) _morphWave = 0;
+  _morph = wave % MORPHRANGE;
+  _invMorph = MORPHRANGE - _morph;
+  _morphing = _morph != 0;
 }
 
 void Oscillator::ResetPhase(long polarity) {
   if (polarity == 0)
     _ulphase = 0;
   else
-    _ulphase = (unsigned long)peaks[_table] << REDUCEBITS;
+    _ulphase = (unsigned long)peaks[_wave] << REDUCEBITS;
 }
 
 void Oscillator::SetPortamentoMs(unsigned long milliseconds){
