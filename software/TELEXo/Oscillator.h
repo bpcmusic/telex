@@ -16,6 +16,7 @@
 #define WAVEFORMS 5
 #define MORPHRANGE 1000
 
+#define PHASEBITS 18
 #define TABLEBITS 9
 #define REDUCEBITS 23 // 32 - TABLEBITS
 #define PHASEMASK 8388607 // ( 1 << REDUCEBITS ) - 1
@@ -39,6 +40,7 @@ class Oscillator
 
     void SetWaveform(int wave);
     void ResetPhase(long polarity);
+    void SetPhaseOffset(int phase);
     void SetWidth(int width);
     void SetRectify(int mode);
 
@@ -71,7 +73,9 @@ class Oscillator
   float _frequency = 0;
   unsigned long _ulphase = 0;
   unsigned long _ulstep = 0;
-  unsigned long _oldulphase = 0;
+  unsigned long _oldPhase = 0;
+  int _phaseOffset = 0;
+  unsigned long _actualPhase = 0;
 
   int _location;
   float _remainder;
