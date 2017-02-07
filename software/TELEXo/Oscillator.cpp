@@ -69,7 +69,9 @@ float Oscillator::Oscillate() {
         _morphValue =  _location < _width ? -32767 : 32767;
         break;
       case 4:
-        if (_actualPhase < _oldPhase) _morphValue = random(0, 65536) - 32878.;
+        if (_ulphase < _oldulphase) 
+          _morphValue = random(0, 65536) - 32878.;
+        _oldulphase = _actualPhase;
         break;
       default:
         _morphValue =  0;
