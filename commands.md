@@ -4,7 +4,12 @@ This document outlines the commands for the open source Teletype Expanders TELEX
 
 ####Changelog
 
-The version history of this document.
+The document's version history - for those of you that follow along. ;)
+
+**Revision v.13w** - 7 February 2017
+
+* added [scanner_darkly](https://github.com/scanner-darkly)'s awesome morphing waveform support for WAVE
+* added [scanner_darkly](https://github.com/scanner-darkly)'s super useful oscillator phase offset
 
 **Revision v.13p** - 14 January 2017
 
@@ -101,8 +106,9 @@ TO.OSC.FQ 1-n &alpha; | targets oscillation to frequency &alpha; in Hz
 TO.OSC.FQ.SET 1-n &alpha; | sets oscillation to frequency &alpha; in Hz; ignores OSC.SLEW
 TO.OSC.LFO 1-n &alpha; | targets oscillation to frequency &alpha; in mHz (millihertz: 10^-3 Hz)
 TO.OSC.LFO.SET 1-n &alpha; | sets oscillation to frequency &alpha; in mHz (millihertz: 10^-3 Hz); ignores OSC.SLEW
-TO.OSC.WAVE 1-n &alpha; | set the waveform to sine (0), triangle (1), saw (2), pulse (3), or noise (4)
+TO.OSC.WAVE 1-n &alpha; | set the waveform to sine (0), triangle (1000), saw (2000), pulse (3000), or noise (4000). Range is from 0 to 4999. Oscillator shape is blended in between the "pure" values.
 TO.OSC.SYNC 1-n | resets the phase of the oscillator to zero
+TO.OSC.PHASE 1-n &alpha; | sets the phase offset of the oscillator to &alpha; (0 to 16384) - range of one cycle;
 TO.OSC.WIDTH 1-n &alpha; | sets the width of the pulse  wave (3) to &alpha; (0 to 100)
 TO.OSC.RECT 1-n &alpha; | rectifies the polarity of the oscillator to &alpha; (-2 to 2); see rectification reference
 TO.OSC.SLEW 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (milliseconds)
