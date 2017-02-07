@@ -7,12 +7,19 @@
 #include "Arduino.h"
 #include "Oscillator.h"
 
+/*
+ * Constructor; requires the sampling rate
+ */
 Oscillator::Oscillator(int samplingRate) {
   _samplingRate = samplingRate;
   _krate = samplingRate / 1000;
   _samplingRateDiv2 = _samplingRate / 2;
 }
 
+/*
+ * The primary function called once per sample.
+ * Every operation counts here; if you can, do math elsewhere.
+ */
 float Oscillator::Oscillate() {
 
   // slew frequency?
@@ -26,8 +33,7 @@ float Oscillator::Oscillate() {
   }
 
   // unsigned long automatically wraps
-  _ulphase += _ulstep;
-  _actualPhase = _ulphase + (_phaseOffset << PHASEBITS);
+  _actualPhase += _ulstep;
 
   // reduce this down to meet the tablesize range
   _location = _actualPhase >> REDUCEBITS;
@@ -101,12 +107,18 @@ float Oscillator::Oscillate() {
   
 }
 
+/*
+ * Sets the frequency of the oscillator
+ */
 void Oscillator::SetFreq(float freq){
   _frequency = freq;
   _portamento = false;
   _ulstep = (int)((freq / _samplingRate) * FULLPHASE);
 }
 
+/*
+ * Targets the frequency for the oscillator (when portamento is active)
+ */
 void Oscillator::TargetFreq(float freq){
   _frequency = freq;
   if (_stepsCalculated == 0){
@@ -126,48 +138,83 @@ void Oscillator::TargetFreq(float freq){
 }
 
 
+/*
+ * Sets the freqency via an integer
+ */
 void Oscillator::SetFrequency(int freq) {
   freq = constrain(freq, 0, _samplingRateDiv2);
   SetFreq(freq);
 }
 
+/*
+ * Targets the freqency via an integer (when portamento is active)
+ */
 void Oscillator::TargetFrequency(int freq){
   freq = constrain(freq, 0, _samplingRateDiv2);
   TargetFreq(freq);
 }
 
-
+/*
+ * Sets a floating point frequency
+ */
 void Oscillator::SetFloatFrequency(float freq) {
   freq = constrain(freq, 0, _samplingRateDiv2);
   SetFreq(freq);
 }
 
-
+/*
+ * Tarets a floating point frequency (when portamento is active)
+ */
 void Oscillator::TargetFloatFrequency(float freq){
   freq = constrain(freq, 0, _samplingRateDiv2);
   TargetFreq(freq);
 }
 
+/*
+ * Sets the LFO in millihertz (10^3 Hz)
+ */
 void Oscillator::SetLFO(int millihertz) {
   millihertz = constrain(millihertz, 0, 32767);
   SetFreq((float)millihertz / 1000.);
 }
 
+/*
+ * Tarets the LFO in millihertz (10^3 Hz)
+ */
 void Oscillator::TargetLFO(int millihertz) {
   millihertz = constrain(millihertz, 0, 32767);
   TargetFreq((float)millihertz / 1000.);
 }
 
+/*
+ * Sets the width of the pulse wave (0-100)
+ */
 void Oscillator::SetWidth(int width) {
   width = constrain(width, 0, 100);
   _width = ((float)width / 100.) * (TABLERANGE - 1);
 }
 
-
+/*
+ * Sets the rectification mode:
+ * -2 - full negative rectification (-(abs)value)
+ * -1 - half negative rectification (ignores the positive values)
+ *  0 - no rectification
+ * +1 - half positive rectification (ignores the negative values)
+ * +2 - full positive rectification ((abs)value)
+ */
 void Oscillator::SetRectify(int mode) {
   _rectify = constrain(mode, -2, 2);
 }
 
+/*
+ * Sets the waveform for the oscillator (0-4999)
+ * Values in between morph
+ * 0    - Sine
+ * 1000 - Triangle
+ * 2000 - Saw
+ * 3000 - Square
+ * 4000 - S/H Noise
+ */
 void Oscillator::SetWaveform(int wave) {
   _wave = constrain(wave / MORPHRANGE, 0, WAVEFORMS - 1);
   _morphWave = _wave + 1;
@@ -177,17 +224,29 @@ void Oscillator::SetWaveform(int wave) {
   _morphing = _morph != 0;
 }
 
+/*
+ * Resets the phase of the oscillator to its default
+ */
 void Oscillator::ResetPhase(long polarity) {
   if (polarity == 0)
-    _ulphase = 0;
+    _actualPhase = _phaseOffset << PHASEBITS;
   else
-    _ulphase = (unsigned long)peaks[_wave] << REDUCEBITS;
+    _actualPhase = (unsigned long)peaks[_wave] << REDUCEBITS;
 }
 
+/*
+ * Sets the oscillator's phase offset
+ */
 void Oscillator::SetPhaseOffset(int phase) {
-  _phaseOffset = constrain(phase, 0, 16384);
+  phase = constrain(phase, 0, 16384);
+  _phaseDelta = phase - _phaseOffset;
+  _phaseOffset = phase;
+  _actualPhase += _phaseDelta << PHASEBITS;
 }
 
+/*
+ * Sets the time for portamento in milliseconds
+ */
 void Oscillator::SetPortamentoMs(unsigned long milliseconds){
   _stepsCalculated = milliseconds * _krate;
   if (_portamento && _steps > 0){
@@ -202,6 +261,9 @@ void Oscillator::SetPortamentoMs(unsigned long milliseconds){
   }
 }
 
+/*
+ * Returns the floating point frequency of the oscillator
+ */
 float Oscillator::GetFrequency(){
   return _frequency;
 }

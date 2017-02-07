@@ -449,7 +449,7 @@ void CVOutput::TriggerEnvelope(){
    
 /*
  * The Update Function to Fulfil the Virtual Requirement
- * Keep it Lean - You Don't have Much CPU
+ * Keep it Lean - You don't have Much CPU
  */
 void FASTRUN CVOutput::Update() {
 
@@ -538,6 +538,7 @@ void CVOutput::UpdateLED() {
     _updateLED = false;
     // calculate the LED value and update it
     _ledHelper = _oscilMode ? abs(_cvHelper) >> 7 : abs(_current) >> 22;
+    _ledHelper = constrain(_ledHelper, 0, 255);
     analogWrite(_led, _ledHelper);
   }
 }

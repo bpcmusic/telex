@@ -71,12 +71,12 @@ class Oscillator
   int _morphValue = 0;
 
   float _frequency = 0;
-  unsigned long _ulphase = 0;
   unsigned long _ulstep = 0;
   unsigned long _oldPhase = 0;
   int _phaseOffset = 0;
   unsigned long _actualPhase = 0;
-
+  int _phaseDelta = 0;
+  
   int _location;
   float _remainder;
   
