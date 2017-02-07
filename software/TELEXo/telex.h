@@ -72,6 +72,7 @@
 #define TO_OSC_SLEW_S 0x50
 #define TO_OSC_SLEW_M 0x51
 #define TO_OSC_TR_ACT 0x52
+#define TO_OSC_PHASE 0x53
 
 #define TO_ENV_ACT 0x60
 #define TO_ENV_ATT 0x61

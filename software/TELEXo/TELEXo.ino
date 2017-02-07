@@ -343,6 +343,11 @@ void actOnCommand(byte cmd, byte out, int value){
       cvOutputs[targetOutput]->Sync();
       break;
       
+    case TO_OSC_PHASE:
+      // 
+      cvOutputs[targetOutput]->SetPhaseOffset(value);
+      break;
+      
     case TO_OSC_WAVE:
       // 
       cvOutputs[targetOutput]->SetWaveform(value);

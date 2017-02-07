@@ -343,6 +343,13 @@ void CVOutput::Sync(){
 }
 
 /*
+ * Set the oscillator phase offset
+ */
+void CVOutput::SetPhaseOffset(int phase){
+  _oscillator->SetPhaseOffset(phase);
+}
+
+/*
  * Selects the oscillator waveform
  * 0 = Sine
  * 1 = Triangle

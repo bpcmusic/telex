@@ -27,9 +27,10 @@ float Oscillator::Oscillate() {
 
   // unsigned long automatically wraps
   _ulphase += _ulstep;
+  _actualPhase = _ulphase + (_phaseOffset << PHASEBITS);
 
   // reduce this down to meet the tablesize range
-  _location = _ulphase >> REDUCEBITS;
+  _location = _actualPhase >> REDUCEBITS;
    
   switch(_wave){
     case 0:
@@ -40,7 +41,7 @@ float Oscillator::Oscillate() {
         _lastValue =  tables[_wave][_location];
       } else {  
         // interpolate using some fixed math magic (and a floating point scaler)
-        _lastValue = tables[_wave][_location] + (_ulphase & PHASEMASK) * _phasescale * (tables[_wave][_location + 1] - tables[_wave][_location]);
+        _lastValue = tables[_wave][_location] + (_actualPhase & PHASEMASK) * _phasescale * (tables[_wave][_location + 1] - tables[_wave][_location]);
       }
       break;
     case 3:
@@ -48,9 +49,9 @@ float Oscillator::Oscillate() {
       break;
     case 4:
       // generate a new number if we have flipped
-      if (_ulphase < _oldulphase)
+      if (_actualPhase < _oldPhase)
         _lastValue = random(0, 65536) - 32878.;
-      _oldulphase = _ulphase;
+      _oldPhase = _actualPhase;
       break;
     default:
       _lastValue =  0;
@@ -68,7 +69,7 @@ float Oscillator::Oscillate() {
         _morphValue =  _location < _width ? -32767 : 32767;
         break;
       case 4:
-        if (_ulphase < _oldulphase) _morphValue = random(0, 65536) - 32878.;
+        if (_actualPhase < _oldPhase) _morphValue = random(0, 65536) - 32878.;
         break;
       default:
         _morphValue =  0;
@@ -179,6 +180,10 @@ void Oscillator::ResetPhase(long polarity) {
     _ulphase = 0;
   else
     _ulphase = (unsigned long)peaks[_wave] << REDUCEBITS;
+}
+
+void Oscillator::SetPhaseOffset(int phase) {
+  _phaseOffset = constrain(phase, 0, 16384);
 }
 
 void Oscillator::SetPortamentoMs(unsigned long milliseconds){

@@ -55,6 +55,7 @@ class CVOutput : public Output
     void SetWidth(int width);
     void SetRectify(int mode);
     void Sync();
+    void SetPhaseOffset(int phase);
     void SetFrequencySlew(int slew, short format);
 
     void SetOscQuantizationScale(int scale);
