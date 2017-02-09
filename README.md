@@ -12,7 +12,7 @@ The TELEXo (or TXo) is an output expander and the TELEXi (or TXi) is an input ex
 
 * **TELEXi (TXi)**: a 4HP input module that provides 4 control voltage potentiometers and 4 independent control voltage inputs. Up to 8 can be independently addressed by the Teletype.
 
-![TELEX MODULES](telex.jpg)
+![TELEX MODULES](telex_in_case.png)
 
 ## Teletype Firmware
 
@@ -107,6 +107,33 @@ Placing jumpers on rows in the following sequence allows you to designate the un
 The modules are made up with two boards stacked on top of each other and a Teensy 3.2 riding piggyback. They are primarily 603 SMD parts with a few 805, 1206 and SMD ICs thrown in for good measure. If you have assembled any of mxmxmx’s DIY modules (Ornament + Crime, Terminal Tedium, etc.) you should have no problem with the expanders. They are not, however, a beginners project for SMD.
 
 The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; datasheet: http://www.ti.com/product/DAC8564). This part is used by a number of Eurorack modules - including Mutable's *Yarns* and *Ornament + Crime* by mxmxmx. It has tiny little SMD legs that can cause DIY cursing. ;)
+
+### DIY Tips
+
+#### USE THE BUILD MAPS!
+
+The build maps are PDF files that have one page per component per side per board showing you all the places that component goes. This saves a ton of time and avoids the pain-in-the-ass component hunt. They are linked below - but check out the example below:
+
+![Build Map Sample](build_map_sample.png)
+
+Thanks to [c1t1zen](https://www.instagram.com/c1t1zen/) for the idea. :)
+
+#### Crazy Board Naming
+
+I have a goofy naming convention for the boards. It is confusing. But, I embraced the organic silliness. The "Top" Board is the one behind the panel. The "Bottom" Board is the one facing the back of your case. The side of the board with the name of the unit and board on it is considered the "Top" of the board. The other side is considered the bottom. This means The boards and sides are like this:
+
+- **Top Top** - facing the panel; has the jacks, pots and LEDs
+- **Top Bottom** - the back-side of the one facing the panel with a small handful of components
+- **Bottom Bottom** - faces the Top Bottom on the "back board" of the unit
+- **Bottom Top** - faces the back of your case; has the Teensy, power and jumpers mounted on it
+
+Stupid, I know. But it makes a certain kind of back assward sense.
+
+#### Balancing Headers [[ IMPORTANT ]]
+
+In addition to the two signal headers that connect the boards, there are a pair of two pin connectors that provide balance at the top and the bottom of the boards. Keep the following tips in mind:
+
+> The top connector for both modules needs to be installed before the component that it sits behind it is placed. The header pins on the Top Top side should be as near flush as possible. They aid in connecting both boards ground planes, so you don't want them shorting out to the jack (TXo) or the potentiometer (TXi). I actually trim them to be board-level prior to soldering so that they are as flat as possible. I also bend the front foot of the potentiometer (TXi) out of the way a bit so as to avoid contact.
 
 ###TXi Build Files
 
