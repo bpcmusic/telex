@@ -47,10 +47,15 @@ All Teletype output functionality is supported by the TXo. Operators are near-id
 
 Extended functionality of the TXo starts with being able to specify longer values for slew and pulse times (in seconds and minutes). 
 
+The TXo has the following “experimental” features for each of its four TR outputs:
+
+- Configurable pulse dividers for each output
+- Independent metronomes for each output that will pulse each output at intervals that can be set in milliseconds, seconds, minutes, and beats per minute (BPM)
+
 The TXo also has the following “experimental” features for each of its four CV outputs:
 
 - a quantizer with a dozen or so microtonal scales in addition to equal temperament
-- an oscillator (not currently band-limited) that supports frequencies from LFO rates up to around 8kHz with variable waveforms (sine, triangle, saw, variable width square, and noise), and frequency slew (portamento)
+- an oscillator (not currently band-limited) that supports frequencies from LFO rates up to around 8kHz with variable morphing waveforms (sine, triangle, saw, variable width square, and noise), adjustable phase offset, and frequency slew (portamento)
 - an AR (attack + release) envelope generator with times in milliseconds, seconds and minutes
 
 These extended features, when combined together, can really push the envelope of the TXo’s processor and do some crazy stuff. For example: the output's envelope generator can act as a VCA, which turns the expander into a little 4-voice synth.
@@ -102,15 +107,19 @@ Placing jumpers on rows in the following sequence allows you to designate the un
 | 0 | X | X | 7 | 25-28 |
 | X | X | X | 8 | 28-32 |
 
-## DIY
+## DIY Tips and Warnings
 
 The modules are made up with two boards stacked on top of each other and a Teensy 3.2 riding piggyback. They are primarily 603 SMD parts with a few 805, 1206 and SMD ICs thrown in for good measure. If you have assembled any of mxmxmx’s DIY modules (Ornament + Crime, Terminal Tedium, etc.) you should have no problem with the expanders. They are not, however, a beginners project for SMD.
 
 The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; datasheet: http://www.ti.com/product/DAC8564). This part is used by a number of Eurorack modules - including Mutable's *Yarns* and *Ornament + Crime* by mxmxmx. It has tiny little SMD legs that can cause DIY cursing. ;)
 
-### DIY Tips
+#### Be Careful Building the Panels as Designed
 
-#### USE THE BUILD MAPS!
+The AI and PDF files for the panels were originally tested using a laser cutter. They are currently a hair to tight for the LEDs and the 1/8" jacks. I've had to drill out those holes on my production run. It is such a small amount it is ridiculous and massively frustrating. Dang tolerances!!
+
+This will be corrected soon.
+
+#### Use the Build Maps
 
 The build maps are PDF files that have one page per component per side per board showing you all the places that component goes. This saves a ton of time and avoids the pain-in-the-ass component hunt. They are linked below - but check out the example below:
 
@@ -129,11 +138,19 @@ I have a goofy naming convention for the boards. It is confusing. But, I embrace
 
 Stupid, I know. But it makes a certain kind of back assward sense.
 
-#### Balancing Headers [[ IMPORTANT ]]
+#### Balancing Headers IMPORTANT
 
 In addition to the two signal headers that connect the boards, there are a pair of two pin connectors that provide balance at the top and the bottom of the boards. Keep the following tips in mind:
 
 > The top connector for both modules needs to be installed before the component that it sits behind it is placed. The header pins on the Top Top side should be as near flush as possible. They aid in connecting both boards ground planes, so you don't want them shorting out to the jack (TXo) or the potentiometer (TXi). I actually trim them to be board-level prior to soldering so that they are as flat as possible. I also bend the front foot of the potentiometer (TXi) out of the way a bit so as to avoid contact.
+
+#### Stencil Frames are your Friends
+
+There are a bunch of 3D printable frames available for you to help your build process. As there are SMD components on both sides of the three of the four boards across the two modules, these frames help lay the boards flat for the application of solder paste and/or manual soldering of the components. They save you a ton of time and frustration. They are your friends.
+
+There are also MULTI files for three of the dual-sided boards that will help you hold eight boards next to each other at a time. These are really handy if you are building in bulk. All of the files are in the stencil_frame folders inside of the hardware / board folders.
+
+3D Prints were tested on a Prusa i3 MK2 with PLA filament.
 
 ###TXi Build Files
 
@@ -148,6 +165,7 @@ In addition to the two signal headers that connect the boards, there are a pair 
 * [TXi Top Top Build Map](hardware/TELEXi/board/build_map/tt/txi_tt_build_map.pdf)
 * [TXi Top Bottom Build Map](hardware/TELEXi/board/build_map/tb/txi_tb_build_map.pdf)
 * [TXi Panel Files](hardware/TELEXi/panel)
+* [TXi Stencil Frames](hardware/TELEXi/board/stencil_frame)
 
 ###TXo Build Files
 
@@ -162,6 +180,7 @@ In addition to the two signal headers that connect the boards, there are a pair 
 * [TXo Top Top Build Map](hardware/TELEXo/board/build_map/tt/txo_tt_build_map.pdf)
 * [TXo Top Bottom Build Map](hardware/TELEXo/board/build_map/tb/txo_tb_build_map.pdf)
 * [TXo Panel Files](hardware/TELEXo/panel)
+* [TXo Stencil Frames](hardware/TELEXo/board/stencil_frame)
 
 ## Thanks
 * Brian Crabtree and Kelli Cain for creating [Monome](http://monome.org) and their awesome, open Eurorack modules (including the Teletype which started this all).
