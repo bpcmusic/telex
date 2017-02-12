@@ -23,7 +23,7 @@ barTwoEnd = 107.01 + tolerance;
 
 corner = 2.5;
 
-for (a =[0:7]) frame(a * (framex + .5));
+for (a =[0:7]) frame(a * framex);
 
 
 module frame(xOrigin){
