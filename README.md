@@ -113,12 +113,6 @@ The modules are made up with two boards stacked on top of each other and a Teens
 
 The DAC that is used for the TXo is the DAC8564 (Mouser P/N: 595-DAC8564ICPW; datasheet: http://www.ti.com/product/DAC8564). This part is used by a number of Eurorack modules - including Mutable's *Yarns* and *Ornament + Crime* by mxmxmx. It has tiny little SMD legs that can cause DIY cursing. ;)
 
-#### Be Careful Building the Panels as Designed
-
-The AI and PDF files for the panels were originally tested using a laser cutter. They are currently a hair to tight for the LEDs and the 1/8" jacks. I've had to drill out those holes on my production run. It is such a small amount it is ridiculous and massively frustrating. Dang tolerances!!
-
-This will be corrected soon.
-
 #### Use the Build Maps
 
 The build maps are PDF files that have one page per component per side per board showing you all the places that component goes. This saves a ton of time and avoids the pain-in-the-ass component hunt. They are linked below - but check out the example below:
