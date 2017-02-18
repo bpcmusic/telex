@@ -26,6 +26,7 @@ class TriggerOutput : public Output
     void Pulse();
     void SetPolarity(bool polarity);
     void SetTime(int value, short format);
+    void SetWidth(int value);
     
     void SetDivision(int division);
 
@@ -49,8 +50,11 @@ class TriggerOutput : public Output
     unsigned short _counter = 0;
 
     bool _metro = false;
-    unsigned long _metroInterval = 0;
+    unsigned long _metroInterval = 1000;
     unsigned long _nextEvent = 0;
+
+    bool _widthMode = false;
+    int _width = 0;
     
     // 100ms is the teletype's default value for the pulse time
     unsigned long _pulseTime = 100;    

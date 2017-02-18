@@ -382,7 +382,36 @@ void actOnCommand(byte cmd, byte out, int value){
       // 
       cvOutputs[targetOutput]->SetFrequencySlew(value, 2);
       break;
-
+      
+    case TO_OSC_CYC:
+      // 
+      cvOutputs[targetOutput]->TargetCycle(value, 0);
+      break;
+      
+    case TO_OSC_CYC_S:
+      // 
+      cvOutputs[targetOutput]->TargetCycle(value, 1);
+      break;
+      
+    case TO_OSC_CYC_M:
+      // 
+      cvOutputs[targetOutput]->TargetCycle(value, 2);
+      break;
+      
+    case TO_OSC_CYC_SET:
+      // 
+      cvOutputs[targetOutput]->SetCycle(value, 0);
+      break;
+      
+    case TO_OSC_CYC_S_SET:
+      // 
+      cvOutputs[targetOutput]->SetCycle(value, 1);
+      break;
+      
+    case TO_OSC_CYC_M_SET:
+      // 
+      cvOutputs[targetOutput]->SetCycle(value, 2);
+      break;
 
     case TO_ENV_ACT:
       // 
@@ -493,6 +522,11 @@ void actOnCommand(byte cmd, byte out, int value){
     case TO_TR_M_SYNC:
        // Sync Pulse Time for TR Metro
       triggerOutputs[targetOutput]->Sync();    
+      break;
+        
+    case TO_TR_WIDTH:
+       // Set Pulse Time for TR Metro
+      triggerOutputs[targetOutput]->SetWidth(value);    
       break;
 
     case TO_KILL:

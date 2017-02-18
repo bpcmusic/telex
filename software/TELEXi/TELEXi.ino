@@ -234,24 +234,34 @@ void requestEvent() {
  * command list is in the shared telex.h file
  */
 void actOnCommand(byte cmd, byte out, int value){
-  
-  TxIO io = TxHelper::DecodeIO(out);
 
-#ifdef DEBUG
-  Serial.printf("Action: %d, Output: %d\n", cmd, io.Port);
-#endif
+  byte outHelper = out;
 
   // act on your commands
   switch (cmd) {
 
     case TI_IN_SCALE:
+      outHelper += 4;
     case TI_PARAM_SCALE:
-      quant[io.Port]->SetScale(value);
+      quant[outHelper]->SetScale(value);
       break;
 
-    case TI_IN_CALIB:    
+    case TI_IN_TOP:
+      outHelper += 4;
+    case TI_PARAM_TOP:
+      analogReaders[outHelper]->SetTop(value);
+      break;
+
+    case TI_IN_BOT:
+      outHelper += 4;
+    case TI_PARAM_BOT:
+      analogReaders[outHelper]->SetBottom(value);
+      break;
+
+    case TI_IN_CALIB:  
+      outHelper += 4;  
     case TI_PARAM_CALIB:
-      analogReaders[io.Port]->Calibrate(value);
+      analogReaders[outHelper]->Calibrate(value);
       break;    
 
     case TI_STORE:
@@ -262,6 +272,10 @@ void actOnCommand(byte cmd, byte out, int value){
       resetCalibrationData();
       break;
   }
+
+#ifdef DEBUG
+  Serial.printf("Action: %d, Output: %d\n", cmd, outHelper);
+#endif
   
 }
 

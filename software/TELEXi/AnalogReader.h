@@ -9,6 +9,9 @@
 
 #include "Arduino.h"
 
+#define TOP 16383
+#define BOTTOM -16384
+
 /*
  * helper class created for the TELEXi to read and scale inputs
  */
@@ -21,6 +24,10 @@ class AnalogReader
     
     int Read();
     int GetLatest();
+
+    void SetTop(int top);
+    void SetBottom(int bottom);
+    void SetMap (int top, int bottom);
     
     void Calibrate(int measure);
     bool GetCalibrated();
@@ -47,6 +54,11 @@ class AnalogReader
     int _calibrationData[3];
     bool _calibrated = false;
 
+    bool _map = false;
+    int _top = TOP;
+    int _bottom = BOTTOM;
+    
+  
     int _i;
     
 };

@@ -57,6 +57,8 @@ class CVOutput : public Output
     void Sync();
     void SetPhaseOffset(int phase);
     void SetFrequencySlew(int slew, short format);
+    void SetCycle(int value, short format);
+    void TargetCycle(int value, short format);
 
     void SetOscQuantizationScale(int scale);
     void SetQuantizedVOct(int value);

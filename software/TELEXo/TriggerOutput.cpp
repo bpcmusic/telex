@@ -32,8 +32,21 @@ void TriggerOutput::SetState(bool state){
   if (_led > -1) digitalWrite(_led, _state ? HIGH : LOW);
 }
 
+/*
+ * Sets the duration of the trigger pulse in multiple time formats
+ */
 void TriggerOutput::SetTime(int value, short format){
+  _widthMode = false;
   _pulseTime = TxHelper::ConvertMs(value, format);
+}
+
+/*
+ * Sets the duration of the trigger pulse as a percentage of the metro interval
+ */
+void TriggerOutput::SetWidth(int value){
+  _widthMode = true;
+  _width = constrain(value, 0, 100);
+  _pulseTime = _metroInterval * _width / 100.;
 }
 
 /*
@@ -92,6 +105,7 @@ void TriggerOutput::SetMetro(int state){
  */
 void TriggerOutput::SetMetroTime(int value, short format){
   _metroInterval = TxHelper::ConvertMs(value, format);
+  if (_widthMode) SetWidth(_width);
 }
 
 /**

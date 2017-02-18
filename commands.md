@@ -6,6 +6,11 @@ This document outlines the commands for the open source Teletype Expanders TELEX
 
 The document's version history - for those of you that follow along. ;)
 
+**Revision v.13x** - 18 February 2017
+
+* added TXi commands for mapping inputs and param knobs
+* added TXo commands for setting cycle length and trigger length
+
 **Revision v.13w** - 7 February 2017
 
 * added [scanner_darkly](https://github.com/scanner-darkly)'s awesome morphing waveform support for WAVE
@@ -66,6 +71,7 @@ TO.TR.M.M 1-n &alpha; | time for TR.M; &alpha; in minutes
 TO.TR.M.BPM 1-n &alpha; | time for TR.M; &alpha; in Beats Per Minute
 TO.TR.M.ACT 1-n &alpha; | activates the metronome for the TR output; &alpha; (0=off; 1=on)
 TO.TR.M.SYNC 1-n | synchronizes the metronome on the device #
+TO.TR.WIDTH 1-n &alpha; | time for TR.PULSE; &alpha; percentage of TR.M
 
 
 ####TXo Control Voltage (CV) Basic Commands
@@ -115,6 +121,13 @@ TO.OSC.SLEW 1-n &alpha; | sets the slew time for the oscillator (portamento) to 
 TO.OSC.SLEW.S 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (seconds)
 TO.OSC.SLEW.M 1-n &alpha; | sets the slew time for the oscillator (portamento) to &alpha; (minutes)
 TO.OSC.SCALE 1-n &alpha; | sets the quantization scale for the oscillator to scale # &alpha; (listed below)
+TO.OSC.CYC 1-n &alpha; | targets the cycle length for the oscillator to &alpha; (milliseconds)
+TO.OSC.CYC.S 1-n &alpha; | targets the cycle length for the oscillator to &alpha; (seconds)
+TO.OSC.CYC.M 1-n &alpha; | targets the cycle length for the oscillator to &alpha; (minutes)
+TO.OSC.CYC.SET 1-n &alpha; | sets the cycle length for the oscillator to &alpha; (milliseconds)
+TO.OSC.CYC.S.SET 1-n &alpha; | sets the cycle length for the oscillator to &alpha; (seconds)
+TO.OSC.CYC.M.SET 1-n &alpha; | sets the cycle length for the oscillator to &alpha; (minutes)
+
 
 ####TXo Control Voltage (CV) Experimental Commands - Envelope Generator
 

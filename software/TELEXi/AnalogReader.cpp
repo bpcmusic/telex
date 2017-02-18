@@ -20,6 +20,8 @@ AnalogReader::AnalogReader(int address){
 AnalogReader::AnalogReader(int address, bool reverse){
   _address = address;
   _reverse = reverse;
+  if (!_reverse) _bottom = 0;
+  
   _calibrationData[0] = -16384;
   _calibrationData[1] = 0;
   _calibrationData[2] = 16383;
@@ -47,6 +49,13 @@ int FASTRUN AnalogReader::Read() {
   // scale if this input is actively calibrated
   if (_calibrated) _readValue = Scale(_readValue);
 
+  // map it (if we are mapping values)
+  if (_map){
+    // Serial.printf("MAP %d",_readValue);
+    _readValue = map(_readValue, _reverse ? BOTTOM : 0, TOP, _bottom, _top+1);
+    // Serial.printf(" = %d\n",_readValue);
+  }
+
   // store as latest value and return
   _latestValue = _readValue;
   return _latestValue;
@@ -58,6 +67,21 @@ int FASTRUN AnalogReader::Read() {
  */
 int AnalogReader::GetLatest() {
   return _latestValue;
+}
+
+
+void AnalogReader::SetTop(int top){
+  SetMap(top, _bottom);
+}
+
+void AnalogReader::SetBottom(int bottom){
+  SetMap(_top, bottom);
+}
+
+void AnalogReader::SetMap(int top, int bottom){
+  if (_top != top) _top = top;
+  if (_bottom != bottom) _bottom = bottom;
+  _map = _top != TOP || _bottom != (_reverse ? BOTTOM : 0);
 }
 
 /*

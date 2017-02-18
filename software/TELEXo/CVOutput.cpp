@@ -286,6 +286,24 @@ void CVOutput::TargetOscNote(int note){
 }
 
 /*
+ * Sets the duration of a single cycle
+ */
+void CVOutput::SetCycle(int value, short format){
+   _oscilMode = true;
+   value = TxHelper::ConvertMs(value, format);
+   _oscillator->SetFloatFrequency(1000. / value);
+}
+
+/*
+ * Targets the duration of a single cycle
+ */
+void CVOutput::TargetCycle(int value, short format){
+   _oscilMode = true;
+   value = TxHelper::ConvertMs(value, format);
+   _oscillator->TargetFloatFrequency(1000. / value);
+}
+
+/*
  * Sets the pulse width of the square wave waveform
  */
 void CVOutput::SetWidth(int width){
