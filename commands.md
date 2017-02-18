@@ -181,9 +181,11 @@ Command  | Description
 TI.IN.QT 1-n | return the quantized value for the IN jack; uses input's IN.SCALE
 TI.IN.N 1-n | return the quantized note number for the IN jack; uses the input's IN.SCALE
 TI.IN.SCALE 1-n &alpha; | sets the current scale for the input to &alpha;; see scale reference below
+TI.IN.MAP 1-n &alpha; &beta; | maps the IN values to the range &alpha; - &beta;
 TI.PARAM.QT 1-n | return the quantized value for the PARAM knob; uses knob's PARAM.SCALE
 TI.PARAM.N 1-n | return the quantized note number for the PARAM knob; uses knob's PARAM.SCALE
 TI.PARAM.SCALE 1-n &alpha; | sets the current scale for the param knob to &alpha;; see scale reference below
+TI.PARAM.MAP 1-n &alpha; &beta; | maps the PARAM values to the range &alpha; - &beta;
 
 ####TXi Experimental Commands
 
