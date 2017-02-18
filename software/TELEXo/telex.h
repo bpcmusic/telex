@@ -37,6 +37,7 @@
 #define TO_TR_M_ACT 0x0C
 #define TO_TR_M_SYNC 0x0D
 #define TO_TR_WIDTH 0x0E
+#define TO_TR_M_COUNT 0x0F
 
 #define TO_CV 0x10
 #define TO_CV_SET 0x11

@@ -96,7 +96,10 @@ void TriggerOutput::SetDivision(int division){
  */
 void TriggerOutput::SetMetro(int state){
   bool m = state != 0;
-  if (m && !_metro) Sync();
+  if (m){  
+    _actualCount = _metroCount;
+    if (!_metro) Sync();
+  }
   _metro = m;
 }
 
@@ -106,6 +109,14 @@ void TriggerOutput::SetMetro(int state){
 void TriggerOutput::SetMetroTime(int value, short format){
   _metroInterval = TxHelper::ConvertMs(value, format);
   if (_widthMode) SetWidth(_width);
+}
+
+/**
+ * Sets the number of trigger repeats on an M event (0 = inf)
+ */
+void TriggerOutput::SetMetroCount(int value){
+  _metroCount = value;
+  _actualCount = value;
 }
 
 /**
@@ -138,7 +149,10 @@ void FASTRUN TriggerOutput::Update(unsigned long currentTime){
 
   // evaluate pinging the metro event
   if (_metro && currentTime >= _nextEvent){
-    _nextEvent = currentTime + _metroInterval;
+    if (_metroCount == 0 || (_metroCount > 0 && --_actualCount > 0))
+      _nextEvent = currentTime + _metroInterval;
+    else
+      _metro = false;
     Pulse();
   }
   

@@ -83,6 +83,8 @@ class CVOutput : public Output
     void UpdateLED();
     
   protected:
+
+    static int _ledMap[256];
     
   private:
 

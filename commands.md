@@ -6,10 +6,15 @@ This document outlines the commands for the open source Teletype Expanders TELEX
 
 The document's version history - for those of you that follow along. ;)
 
+**Revision v.13y** - 18 February 2017
+
+* added TXo commands for setting repeat counter for TR.M events
+
 **Revision v.13x** - 18 February 2017
 
 * added TXi commands for mapping inputs and param knobs
 * added TXo commands for setting cycle length and trigger length
+* added TXo commands for setting repeat counter for TR.M events
 
 **Revision v.13w** - 7 February 2017
 
@@ -70,6 +75,7 @@ TO.TR.M.S 1-n &alpha; | time for TR.M; &alpha; in seconds
 TO.TR.M.M 1-n &alpha; | time for TR.M; &alpha; in minutes
 TO.TR.M.BPM 1-n &alpha; | time for TR.M; &alpha; in Beats Per Minute
 TO.TR.M.ACT 1-n &alpha; | activates the metronome for the TR output; &alpha; (0=off; 1=on)
+TO.TR.M.COUNT 1-n &alpha; | sets the number of repeats before deactivating (0=infinity)
 TO.TR.M.SYNC 1-n | synchronizes the metronome on the device #
 TO.TR.WIDTH 1-n &alpha; | time for TR.PULSE; &alpha; percentage of TR.M
 

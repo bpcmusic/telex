@@ -32,6 +32,8 @@ class TriggerOutput : public Output
 
     void SetMetro(int state);
     void SetMetroTime(int value, short format);
+    void SetMetroCount(int value);
+    
     void Sync();
 
     // virtual implementations
@@ -52,6 +54,9 @@ class TriggerOutput : public Output
     bool _metro = false;
     unsigned long _metroInterval = 1000;
     unsigned long _nextEvent = 0;
+
+    int _metroCount = 0;
+    int _actualCount = -1;
 
     bool _widthMode = false;
     int _width = 0;

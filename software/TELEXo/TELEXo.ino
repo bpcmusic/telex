@@ -529,6 +529,11 @@ void actOnCommand(byte cmd, byte out, int value){
       triggerOutputs[targetOutput]->SetWidth(value);    
       break;
 
+    case TO_TR_M_COUNT:
+       // Set Count for M Repeats
+      triggerOutputs[targetOutput]->SetMetroCount(value);    
+      break;
+      
     case TO_KILL:
       for(int w=0; w<4; w++){
         
