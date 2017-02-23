@@ -16,7 +16,9 @@ The TELEXo (or TXo) is an output expander and the TELEXi (or TXi) is an input ex
 
 ## Teletype Firmware
 
-Until the TELEX support is merged into the Teletype firmware, you can grab and compile a version of the TT firmware that supports the TELEX modules from this fork: [Teletype Fork Supporting TELEX Modules](https://github.com/bpcmusic/teletype).
+Make sure you have the latest [Teletype Firmware](https://github.com/monome/teletype) to ensure that your Teletype supports the command set for the TELEX modules. This is a part of the core Teletype release as of 23 February 2017. 
+
+Experimental Teletype Firmware Updates will be posted in the [TELEX Teletype Fork](https://github.com/bpcmusic/teletype) from time to time.
 
 ## TELEX Firmware
 
