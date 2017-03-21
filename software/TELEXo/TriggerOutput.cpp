@@ -150,7 +150,7 @@ void FASTRUN TriggerOutput::Update(unsigned long currentTime){
   // evaluate pinging the metro event
   if (_metro && currentTime >= _nextEvent){
     if (_metroCount == 0 || (_metroCount > 0 && --_actualCount > 0))
-      _nextEvent = currentTime + _metroInterval;
+      _nextEvent = _nextEvent + _metroInterval;
     else
       _metro = false;
     Pulse();
