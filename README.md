@@ -62,7 +62,7 @@ The TXo also has the following “experimental” features for each of its four 
 
 These extended features, when combined together, can really push the envelope of the TXo’s processor and do some crazy stuff. For example: the output's envelope generator can act as a VCA, which turns the expander into a little 4-voice synth.
 
-####Links:
+#### Links:
 
 * [TXo Arduino Firmware](software/TELEXo)
 * [TXo Module PCB](hardware/TELEXo/board)
@@ -148,7 +148,7 @@ There are also MULTI files for three of the dual-sided boards that will help you
 
 3D Prints were tested on a Prusa i3 MK2 with PLA filament.
 
-###TXi Build Files
+### TXi Build Files
 
 [Explore the repository for all kinds of support files](hardware/TELEXi). Here are some of the key ones:
 
@@ -163,7 +163,7 @@ There are also MULTI files for three of the dual-sided boards that will help you
 * [TXi Panel Files](hardware/TELEXi/panel)
 * [TXi Stencil Frames](hardware/TELEXi/board/stencil_frame)
 
-###TXo Build Files
+### TXo Build Files
 
 [Explore the repository for all kinds of support files](hardware/TELEXo). Here are some of the key ones:
 
