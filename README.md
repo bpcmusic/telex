@@ -152,9 +152,9 @@ There are also MULTI files for three of the dual-sided boards that will help you
 
 [Explore the repository for all kinds of support files](hardware/TELEXi). Here are some of the key ones:
 
-* [TXi Schematic](hardware/TELEXi/board/Telex-I Schematic.pdf)
+* [TXi Schematic](hardware/TELEXi/board/Telex-I%20Schematic.pdf)
 * [TXi Gerbers Top](hardware/TELEXi/board/gerbers/TI-TOP-1.1.zip)
-* [TXi Gerbers Bottom](hardware/TELEXi/board/gerbers/TI-BOT 1.1A.zip)
+* [TXi Gerbers Bottom](hardware/TELEXi/board/gerbers/TI-BOT%201.1A.zip)
 * [TXi BOM](hardware/TELEXi/board/TELEXi-BOM.xlsx)
 * [TXi Bottom Top Build Map](hardware/TELEXi/board/build_map/bt/txi_bt_build_map.pdf)
 * [TXi Bottom Bottom Build Map](hardware/TELEXi/board/build_map/bb/txi_bb_build_map.pdf)
@@ -167,7 +167,7 @@ There are also MULTI files for three of the dual-sided boards that will help you
 
 [Explore the repository for all kinds of support files](hardware/TELEXo). Here are some of the key ones:
 
-* [TXo Schematic](hardware/TELEXo/board/Telex-O Schematic.pdf)
+* [TXo Schematic](hardware/TELEXo/board/Telex-O%20Schematic.pdf)
 * [TXo Gerbers Top](hardware/TELEXo/board/gerbers/TO-TOP-1.1.zip)
 * [TXo Gerbers Bottom](hardware/TELEXo/board/gerbers/TO-BOT-1.1.zip)
 * [TXo BOM](hardware/TELEXo/board/TELEXo-BOM.xlsx)
