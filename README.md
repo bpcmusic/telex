@@ -78,7 +78,7 @@ Each 4HP module adds 4 IN jacks and 4 PARAM knobs.
 * The TXi has some extended functionality where the TXi can do quantization for you and return note numbers against any one of its internal scales (there are about 12 or so). 
 * Inputs are sampled with 13bit resolution.
 
-####Links:
+#### Links:
 
 * [TXo Arduino Firmware](software/TELEXi)
 * [TXo Module PCB](hardware/TELEXi/board)
