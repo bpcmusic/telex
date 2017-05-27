@@ -1,8 +1,8 @@
-#TELEX Command Reference
+# TELEX Command Reference
 
 This document outlines the commands for the open source Teletype Expanders TELEXo and TELEXi. You can also use this [Printable Command Reference](extras/TELEX Command Reference.pdf).
 
-####Changelog
+#### Changelog
 
 The document's version history - for those of you that follow along. ;)
 
@@ -35,7 +35,7 @@ The document's version history - for those of you that follow along. ;)
 * first version of the command reference document
 
 
-####Notes
+#### Notes
 
 * **Basic Commands** represent commands that have 1 to 1 equivalents in the Teletype command set
 * **Extended Commands** represent commands that are new to the expanders but have close equivalents in the Teletype command set
@@ -45,9 +45,9 @@ The document's version history - for those of you that follow along. ;)
 * **&alpha;** represents the value that you are supplying to an operator that takes a parameter
 * **&alpha;** values for control voltages are *bipolar* on the TELEXo - they accept values between -16384 to 16383
 
-##TELEXo (TXo)
+## TELEXo (TXo)
 
-####TXo Trigger Output (TR) Basic Commands
+#### TXo Trigger Output (TR) Basic Commands
 
 Command  | Description 
 ------------- | ------------- 
@@ -57,7 +57,7 @@ TO.TR.PULSE 1-n | Pulse TR using TO.TR.TIME/S/M as an interval
 TO.TR.TIME 1-n &alpha; | time for TR.PULSE; &alpha; in milliseconds
 TO.TR.POL 1-n &alpha; | polarity for TO.TR.PULSE set to &alpha; (0-1)
 
-####TXo Trigger Output (TR) Extended Commands
+#### TXo Trigger Output (TR) Extended Commands
 
 Command  | Description 
 ------------- | ------------- 
@@ -65,7 +65,7 @@ TO.TR.TIME.S 1-n &alpha; | time for TR.PULSE; &alpha; in seconds
 TO.TR.TIME.M 1-n &alpha; | time for TR.PULSE; &alpha; in minutes
 
 
-####TXo Trigger Output (TR) Experimental Commands - Divider + Metronomes
+#### TXo Trigger Output (TR) Experimental Commands - Divider + Metronomes
 
 Command  | Description 
 ------------- | ------------- 
@@ -80,7 +80,7 @@ TO.TR.M.SYNC 1-n | synchronizes the metronome on the device #
 TO.TR.WIDTH 1-n &alpha; | time for TR.PULSE; &alpha; percentage of TR.M
 
 
-####TXo Control Voltage (CV) Basic Commands
+#### TXo Control Voltage (CV) Basic Commands
 
 Command  | Description 
 ------------- | ------------- 
@@ -90,7 +90,7 @@ TO.CV.SET 1-n &alpha; | set CV to &alpha; (bipolar); ignoring SLEW
 TO.CV.OFF 1-n &alpha; | CV offset; &alpha; added at final stage 
 
 
-####TXo Control Voltage (CV) Extended Commands
+#### TXo Control Voltage (CV) Extended Commands
 
 Command  | Description 
 ------------- | ------------- 
@@ -102,7 +102,7 @@ TO.CV.N 1-n &alpha; | CV target note # &alpha; in output's current CV.SCALE
 TO.CV.N.SET 1-n &alpha; | set CV to note # &alpha; in output's current CV.SCALE; ignoring SLEW
 TO.CV.SCALE 1-n &alpha; | select scale # &alpha; for individual CV output; see quantization scale reference below
 
-####TXo Control Voltage (CV) Experimental Commands - Oscillator Functions
+#### TXo Control Voltage (CV) Experimental Commands - Oscillator Functions
 
 Note: to start oscillation, set the frequency for the CV output to a value greater than zero. To return it to basic functionality, set it back to zero (0). When in oscillation mode, the current CV value sets the peak for the waveform - think of it like a volume or range control.
 
@@ -135,7 +135,7 @@ TO.OSC.CYC.S.SET 1-n &alpha; | sets the cycle length for the oscillator to &alph
 TO.OSC.CYC.M.SET 1-n &alpha; | sets the cycle length for the oscillator to &alpha; (minutes)
 
 
-####TXo Control Voltage (CV) Experimental Commands - Envelope Generator
+#### TXo Control Voltage (CV) Experimental Commands - Envelope Generator
 
 Note: when you activate the envelope (using ENV.ACT) your CV output will drop to zero. You need to trigger the envelope (ENV.TRIG) in order to get it to play. This will interact with your currently set CV value for the output making that the (bipolar capable) peak for the envelope. Also, this will interact with the oscillator as well and become a virtual VCA for its output.
 
@@ -150,7 +150,7 @@ TO.ENV.DEC.S 1-n &alpha; | decay time for the envelope; &alpha; in seconds
 TO.ENV.DEC.M 1-n &alpha; | decay time for the envelope; &alpha; in minutes
 TO.ENV.TRIG 1-n | triggers the envelope to play
 
-####TXo Global Commands
+#### TXo Global Commands
 
 This command affects both trigger (TR) and control voltage (CV) outputs.
 
@@ -173,14 +173,14 @@ Mode | Behavior
 
 ## TELEXi (TXi)
 
-####TXi Basic Commands
+#### TXi Basic Commands
 
 Command  | Description 
 ------------- | ------------- 
 TI.IN 1-n | reads the value of the CV input jack (-16384 to 16383)
 TI.PARAM 1-n | reads the value of the PARAM knob (0 to 16383) 
 
-####TXi Extended Commands
+#### TXi Extended Commands
 
 Command  | Description 
 ------------- | ------------- 
@@ -193,7 +193,7 @@ TI.PARAM.N 1-n | return the quantized note number for the PARAM knob; uses knob'
 TI.PARAM.SCALE 1-n &alpha; | sets the current scale for the param knob to &alpha;; see scale reference below
 TI.PARAM.MAP 1-n &alpha; &beta; | maps the PARAM values to the range &alpha; - &beta;
 
-####TXi Experimental Commands
+#### TXi Experimental Commands
 
 The calibration settings allow you to scale your input values for the IN jacks and the PARAM knobs to compensate for component tolerances. The calibration procedures are listed in the Calibration Details section.
 
@@ -206,7 +206,7 @@ TI.PARAM.CALIB 1-n &alpha; | calibrates the scaling for the PARAM knob; see cali
 TI.STORE 1-x | stores the calibration data for the expander to its flash memory
 TI.RESET 1-x | resets the calibration data to factory defaults
 
-####TXi Calibration Details
+#### TXi Calibration Details
 
 Calibration for the input module works as follows:
 
