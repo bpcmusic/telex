@@ -37,70 +37,54 @@ float Oscillator::Oscillate() {
 
   // reduce this down to meet the tablesize range
   _location = _actualPhase >> REDUCEBITS;
-   
-  switch(_wave){
-    case 0:
-    case 1:
-    case 2:
-      if (_portamento || _morphing){
-        // no interpolation or rounding
-        _lastValue =  tables[_wave][_location];
-      } else {  
-        // interpolate using some fixed math magic (and a floating point scaler)
-        _lastValue = tables[_wave][_location] + (_actualPhase & PHASEMASK) * _phasescale * (tables[_wave][_location + 1] - tables[_wave][_location]);
-      }
-      break;
-    case 3:
-      _lastValue =  _location < _width ? -32767 : 32767;
-      break;
-    case 4:
-      // generate a new number if we have flipped
-      if (_actualPhase < _oldPhase)
-        _lastValue = random(0, 65536) - 32878.;
-      _oldPhase = _actualPhase;
-      break;
-    default:
-      _lastValue =  0;
-      break;
+
+  // optimized to chained if statements
+  if (_wave < 3) {
+    if (_portamento || _morphing || _doRect){
+      // no interpolation or rounding
+      _lastValue =  tables[_wave][_location];
+    } else {  
+      // interpolate using some fixed math magic (and a floating point scaler)
+      _lastValue = tables[_wave][_location] + (_actualPhase & PHASEMASK) * _phasescale * (tables[_wave][_location + 1] - tables[_wave][_location]);
+    }
+  } else if (_wave == 3) {
+    _lastValue =  _location < _width ? -32767 : 32767;
+  } else if (_wave == 4) {
+    // generate a new number if we have flipped
+    if (_actualPhase < _oldPhase)
+      _lastValue = random(0, 65536) - 32878.;
+    _oldPhase = _actualPhase;
+  } else {
+    _lastValue =  0;
   }
 
+  // optimized by moving to chained if statements
   if (_morphing){
-    switch(_morphWave){
-      case 0:
-      case 1:
-      case 2:
-        _morphValue =  tables[_morphWave][_location];
-        break;
-      case 3:
-        _morphValue =  _location < _width ? -32767 : 32767;
-        break;
-      case 4:
-        if (_actualPhase < _oldPhase)
-          _morphValue = random(0, 65536) - 32878.;
-        _oldPhase = _actualPhase;
-        break;
-      default:
-        _morphValue =  0;
-        break;
+    if(_morphWave < 3){
+      _morphValue =  tables[_morphWave][_location];
+    } else if (_morphWave == 3) {
+      _morphValue =  _location < _width ? -32767 : 32767;
+    } else if (_morphWave == 4) {
+      if (_actualPhase < _oldPhase)
+        _morphValue = random(0, 65536) - 32878.;
+      _oldPhase = _actualPhase;
+    } else {
+      _morphValue =  0;
     }
     _lastValue = (_lastValue * _invMorph + _morphValue * _morph) / MORPHRANGE;
   }
 
-  switch(_rectify){
-    case 0:
-      break;
-    case -2:
+  // optimized by moving to sequential if statements and a rect bool
+  if (_doRect){
+    if(_rectify == -2){
       _lastValue = -abs(_lastValue);
-      break;
-    case -1:
+    } else if (_rectify == -1) {
       _lastValue = _lastValue <= 0 ? _lastValue : 0;
-      break;
-    case 1:
+    } else if (_rectify == 1) {
       _lastValue = _lastValue >= 0 ? _lastValue : 0;
-      break;
-    case 2:
+    } else if (_rectify == 2) {
       _lastValue = abs(_lastValue);
-      break;
+    }
   }
   
   return _lastValue;
@@ -204,6 +188,7 @@ void Oscillator::SetWidth(int width) {
  */
 void Oscillator::SetRectify(int mode) {
   _rectify = constrain(mode, -2, 2);
+  _doRect = _rectify != 0;
 }
 
 /*

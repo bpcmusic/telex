@@ -46,8 +46,13 @@
 #define TO_CV_SLEW_M 0x14
 #define TO_CV_OFF 0x15
 
+#define TO_TR_PULSE_MUTE 0x16
+
 #define TO_KILL 0x20
 #define TO_RESET 0x21
+#define TO_TR_INIT 0x22
+#define TO_CV_INIT 0x23
+#define TO_INIT 0x24
 
 #define TO_CV_QT 0x30
 #define TO_CV_QT_SET 0x31

@@ -107,16 +107,26 @@ void CVOutput::Kill(){
 }
 
 /*
- * Stop Slew Activity and Jump to Target
+ * Reset the CV Output
  */
 void CVOutput::Reset(){
-  SetFrequencySlew(0, 0);
-  SetFrequency(0);
+  SetOffset(0);
+  SetValue(0);
+  SetSlew(0,0);
   SetQuantizationScale(0);
+  
+  SetFrequency(0);
   SetOscQuantizationScale(0);
+  SetWaveform(0);
+  SetPhaseOffset(0);
+  SetRectify(0);
+  SetWidth(50);
+  SetFrequencySlew(0, 0);
+  
   SetEnvelopeMode(0);
-  SetAttack(7, 0);
-  SetDecay(500, 0);
+  SetAttack(12, 0);
+  SetDecay(250, 0);
+  
 }
 
 /*
@@ -130,14 +140,16 @@ void CVOutput::SetQuantizationScale(int scale){
  * Quantizes and sets a value to the current scale
  */
 void CVOutput::SetQuantizedValue(int note){
-  SetValue(_quantizer->Quantize(note).Value << 1);
+  int16_t neg = note < 0 ? -1 : 1;
+  SetValue((neg * _quantizer->Quantize(abs(note)).Value) << 1);
 }
 
 /*
  * Quantizes and targets a value (with slew) to the current scale
  */
 void CVOutput::TargetQuantizedValue(int note){
-  TargetValue(_quantizer->Quantize(note).Value << 1);
+  int16_t neg = note < 0 ? -1 : 1;
+  TargetValue((neg * _quantizer->Quantize(abs(note)).Value) << 1);
 }
 
 /*
@@ -145,7 +157,8 @@ void CVOutput::TargetQuantizedValue(int note){
  * (against the active Quantization Scale)
  */
 void CVOutput::SetNote(int note){
-    SetValue((int)_quantizer->GetValueForNote(note) << 1);
+  int16_t neg = note < 0 ? -1 : 1;
+    SetValue((neg * (int)_quantizer->GetValueForNote(abs(note))) << 1);
 }
 
 /*
@@ -153,7 +166,8 @@ void CVOutput::SetNote(int note){
  * (against the active Quantization Scale)
  */
 void CVOutput::TargetNote(int note){
-  TargetValue((int)_quantizer->GetValueForNote(note) <<  1);
+  int16_t neg = note < 0 ? -1 : 1;
+  TargetValue((neg * (int)_quantizer->GetValueForNote(abs(note))) <<  1);
 }
 
 /*
@@ -369,11 +383,11 @@ void CVOutput::SetPhaseOffset(int phase){
 
 /*
  * Selects the oscillator waveform
- * 0 = Sine
- * 1 = Triangle
- * 2 = Saw
- * 3 = Square
- * 4 = Noise / Sample-and-Hold
+ * 0    = Sine
+ * 1000 = Triangle
+ * 2000 = Saw
+ * 3000 = Square
+ * 4000 = Noise / Sample-and-Hold
  */
 void CVOutput::SetWaveform(int wave){
   _oscillator->SetWaveform(wave);
@@ -540,10 +554,12 @@ void FASTRUN CVOutput::UpdateDAC(int value){
   // invert for DAC circuit
   if (_oscilMode)
     value = (int)(value * (_oscillator->Oscillate() / 32768.));
-  
-  _cvHelper = value;
-  
-  _dac.writeChannel(_output, (32767 - _cvHelper));  
+
+  // added the conditional write only if the CV value changes
+  if (value != _cvHelper){
+    _cvHelper = value;
+    _dac.writeChannel(_output, (32767 - _cvHelper));
+  }  
   
 }
 

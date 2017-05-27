@@ -33,8 +33,11 @@ class TriggerOutput : public Output
     void SetMetro(int state);
     void SetMetroTime(int value, short format);
     void SetMetroCount(int value);
+
+    void SetMute(bool state);
     
     void Sync();
+    void Reset();
 
     // virtual implementations
     void Kill();
@@ -63,6 +66,8 @@ class TriggerOutput : public Output
     
     // 100ms is the teletype's default value for the pulse time
     unsigned long _pulseTime = 100;    
+
+    bool _mutePulse = false;
 };
 
 #endif

@@ -25,6 +25,7 @@ class Output
   
     int _output = -1;
     int _led = -1;
+    bool _hasLed = false;
     
 
   private:

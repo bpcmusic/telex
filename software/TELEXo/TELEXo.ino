@@ -22,13 +22,14 @@
 #include "CVOutput.h"
 #include "TxHelper.h"
 
-// defines
+// logging values
 #define WRITERATE 50.
 #define LEDINTERVAL 100
 #define LOGINTERVAL 10000
 
+// sampling rate and LED rate values
 #define SAMPLINGRATE 15625
-#define LEDRATE 100
+#define LEDRATE 50
 
 /*
  * Ugly Globals
@@ -52,6 +53,7 @@ int dacOutputs[] = { DAC_CHANNEL_D, DAC_CHANNEL_C, DAC_CHANNEL_B, DAC_CHANNEL_A 
 int pwmLedPins[] = { 3,4,5,6 };
 CVOutput *cvOutputs[4];
 int writeRate = 100;
+
 
 // Trigger Outputs
 int trLedPins[] = { 0,1,2,7 };
@@ -266,7 +268,7 @@ void actOnCommand(byte cmd, byte out, int value){
 
     case TO_CV_OFF:
       // set the offset
-      cvOutputs[targetOutput]->SetOffset(value);
+      cvOutputs[targetOutput]->SetOffset(value << 1);
       break;
 
     case TO_CV_QT:
@@ -533,6 +535,11 @@ void actOnCommand(byte cmd, byte out, int value){
        // Set Count for M Repeats
       triggerOutputs[targetOutput]->SetMetroCount(value);    
       break;
+
+    case TO_TR_PULSE_MUTE:
+       // Mute/Unmute the appropriate output
+      triggerOutputs[targetOutput]->SetMute(value);    
+      break;
       
     case TO_KILL:
       for(int w=0; w<4; w++){
@@ -544,6 +551,24 @@ void actOnCommand(byte cmd, byte out, int value){
         cvOutputs[w]->Kill();
         
       } 
+      break;
+
+    case TO_TR_INIT:
+       // initialize the TR Output
+       triggerOutputs[targetOutput]->Reset();
+      break;
+
+    case TO_CV_INIT:
+       // initialize the CV Output
+       cvOutputs[targetOutput]->Reset();
+      break;
+
+    case TO_INIT:
+       // initialize all TR and CV Outputs
+       for(int w=0; w<4; w++){
+          triggerOutputs[w]->Reset();
+          cvOutputs[w]->Reset();
+       }
       break;
     
   }

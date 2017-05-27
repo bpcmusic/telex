@@ -9,11 +9,6 @@
 #include "TxHelper.h"
 
 /*
- * Initialize a Trigger Output without an LED
- */
-TriggerOutput::TriggerOutput(int output) : TriggerOutput(output, -1) { }
-
-/*
  * Initialize a Trigger Output and its LED
  */
 TriggerOutput::TriggerOutput(int output, int led) : Output(output, led) {
@@ -29,7 +24,7 @@ TriggerOutput::TriggerOutput(int output, int led) : Output(output, led) {
 void TriggerOutput::SetState(bool state){
   _state = state;
   digitalWrite(_output, _state ? HIGH : LOW);
-  if (_led > -1) digitalWrite(_led, _state ? HIGH : LOW);
+  digitalWrite(_led, _state ? HIGH : LOW);
 }
 
 /*
@@ -61,6 +56,9 @@ void TriggerOutput::ToggleState(){
  * Pulse the Trigger for the Time Interval
  */
 void TriggerOutput::Pulse() {
+
+  // jump out if pulses are muted
+  if (_mutePulse) return;
 
   // implement the clock divider (if active)
   if (_divide) {
@@ -119,11 +117,33 @@ void TriggerOutput::SetMetroCount(int value){
   _actualCount = value;
 }
 
+/*
+ * Mute (true) or unmute (false) the PULSE command
+ */
+void TriggerOutput::SetMute(bool state){
+  _mutePulse = state;
+}
+
 /**
  * Syncs the metro pulse to now
  */
 void TriggerOutput::Sync(){
   _nextEvent = millis();
+}
+
+
+/**
+ * Resets the trigger output
+ */
+void TriggerOutput::Reset(){
+  SetPolarity(true);
+  SetState(false);
+  SetTime(100, 0);
+  SetDivision(1);
+  SetMetro(0);
+  SetMetroTime(1000,0);
+  SetMetroCount(0);
+  SetMute(false);
 }
 
 

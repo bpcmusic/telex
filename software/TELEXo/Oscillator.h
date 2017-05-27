@@ -63,8 +63,8 @@ class Oscillator
     
   private:
 
-  int _wave = 0;
-  int _morphWave = 1;
+  uint8_t _wave = 0;
+  uint8_t _morphWave = 1;
   int _morph = 0;
   int _invMorph = MORPHRANGE;
   bool _morphing = false;
@@ -83,7 +83,8 @@ class Oscillator
   float _lastValue;
   int _width = TABLERANGEDIV2;
 
-  int _rectify = 0;
+  int8_t _rectify = 0;
+  bool _doRect = false;
 
   int _samplingRate;
   int _samplingRateDiv2;
