@@ -88,7 +88,7 @@ void CVOutput::SetSlew(int value, short format){
  */
 void CVOutput::SetOffset(int value){
   // neutralize old offset and add new offset to target
-  _tempTarget = Constrain(((_envelopeMode ? _envTarget : _target) >> 15) - _offset + value) << 15;
+  _tempTarget = Constrain(((_envelopeActive ? _envTarget : _target) >> 15) - _offset + value) << 15;
   // store the new offset
   _offset = value;
   _lOffset = _offset << 15;
