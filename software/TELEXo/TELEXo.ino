@@ -1,6 +1,6 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016, 2017 Brendon Cassidy
  * MIT License
  */
 
@@ -129,6 +129,7 @@ void setup() {
     // set up the trigger and cv outputs
     triggerOutputs[i] = new TriggerOutput(trPins[i], trLedPins[i]);
     cvOutputs[i] = new CVOutput(dacOutputs[i], pwmLedPins[i], dac, SAMPLINGRATE);
+    cvOutputs[i]->ReferenceTriggers(triggerOutputs, sizeof(triggerOutputs));
   }
 
   // start the write timer
@@ -238,6 +239,8 @@ void actOnCommand(byte cmd, byte out, int value){
   Serial.printf("Action: %d, Output: %d, Value: %d\n", cmd, targetOutput, value);
 #endif
 
+  unsigned long ms = millis();
+  
   // noInterrupts();
   switch(cmd) {
     
@@ -294,6 +297,11 @@ void actOnCommand(byte cmd, byte out, int value){
     case TO_CV_SCALE:
       // Set Pulse Time Format Trigger
       cvOutputs[targetOutput]->SetQuantizationScale(value);
+      break;
+      
+    case TO_CV_LOG:
+      // Enable Logarithmic Transformationn
+      cvOutputs[targetOutput]->SetLog(value);
       break;
 
     case TO_OSC:
@@ -415,6 +423,11 @@ void actOnCommand(byte cmd, byte out, int value){
       cvOutputs[targetOutput]->SetCycle(value, 2);
       break;
 
+    case TO_OSC_CTR:
+      //
+      cvOutputs[targetOutput]->SetCenter(value << 1);
+      break;
+
     case TO_ENV_ACT:
       // 
       cvOutputs[targetOutput]->SetEnvelopeMode(value);
@@ -454,7 +467,21 @@ void actOnCommand(byte cmd, byte out, int value){
       // 
       cvOutputs[targetOutput]->TriggerEnvelope();
       break;
-   
+      
+    case TO_ENV_EOR:
+      // 
+      cvOutputs[targetOutput]->SetEOR(value - 1);
+      break;
+      
+    case TO_ENV_EOC:
+      // 
+      cvOutputs[targetOutput]->SetEOC(value - 1);
+      break;
+
+    case TO_ENV_LOOP:
+      // 
+      cvOutputs[targetOutput]->SetLoop(value);
+      break;
 
     case TO_TR:
       // Set Trigger Value
@@ -496,9 +523,14 @@ void actOnCommand(byte cmd, byte out, int value){
       triggerOutputs[targetOutput]->SetDivision(value);
       break;
 
+    case TO_TR_M_MUL:
+      // Set Clock Divider
+      triggerOutputs[targetOutput]->SetMultiplier(value);
+      break;
+
     case TO_TR_M_ACT:
       // Set Clock Divider
-      triggerOutputs[targetOutput]->SetMetro(value);
+      triggerOutputs[targetOutput]->SetMetro(value, ms);
       break;
 
     case TO_TR_M:
@@ -525,6 +557,48 @@ void actOnCommand(byte cmd, byte out, int value){
        // Sync Pulse Time for TR Metro
       triggerOutputs[targetOutput]->Sync();    
       break;
+
+    case TO_M_ACT:
+      // Set Clock Divider
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetro(value, ms);
+      break;
+
+    case TO_M:
+       // Set Pulse Time for TR Metro
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetroTime(value, 0);    
+      break;
+      
+    case TO_M_S:
+       // Set Pulse Time for TR Metro
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetroTime(value, 1);    
+      break;
+      
+    case TO_M_M:
+       // Set Pulse Time for TR Metro
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetroTime(value, 2);    
+      break;
+        
+    case TO_M_BPM:
+       // Set Pulse Time for TR Metro
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetroTime(value, 3);    
+      break;
+
+    case TO_M_COUNT:
+       // Set Count for M Repeats
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->SetMetroCount(value); 
+      break;
+             
+    case TO_M_SYNC:
+       // Sync Pulse Time for TR Metro
+      for (int w = 0; w < 4; w++)
+        triggerOutputs[w]->Sync(ms);
+      break;
         
     case TO_TR_WIDTH:
        // Set Pulse Time for TR Metro
@@ -538,7 +612,7 @@ void actOnCommand(byte cmd, byte out, int value){
 
     case TO_TR_PULSE_MUTE:
        // Mute/Unmute the appropriate output
-      triggerOutputs[targetOutput]->SetMute(value);    
+      triggerOutputs[targetOutput]->SetMute(value == 1);  
       break;
       
     case TO_KILL:

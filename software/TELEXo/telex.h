@@ -47,6 +47,15 @@
 #define TO_CV_OFF 0x15
 
 #define TO_TR_PULSE_MUTE 0x16
+#define TO_TR_M_MUL 0x17
+
+#define TO_M 0x18
+#define TO_M_S 0x19
+#define TO_M_M 0x1A
+#define TO_M_BPM 0x1B
+#define TO_M_ACT 0x1C
+#define TO_M_SYNC 0x1D
+#define TO_M_COUNT 0x1E
 
 #define TO_KILL 0x20
 #define TO_RESET 0x21
@@ -59,6 +68,7 @@
 #define TO_CV_N 0x32
 #define TO_CV_N_SET 0x33
 #define TO_CV_SCALE 0x34
+#define TO_CV_LOG 0x35
 
 #define TO_OSC 0x40
 #define TO_OSC_SET 0x41
@@ -87,6 +97,8 @@
 #define TO_OSC_CYC_S_SET 0x58
 #define TO_OSC_CYC_M_SET 0x59
 
+#define TO_OSC_CTR 0x5A
+
 #define TO_ENV_ACT 0x60
 #define TO_ENV_ATT 0x61
 #define TO_ENV_ATT_S 0x62
@@ -97,6 +109,10 @@
 #define TO_ENV_TRIG 0x67
 #define TO_ENV_CYC 0x68
 #define TO_ENV_BPOL 0x69
+
+#define TO_ENV_EOR 0x6A
+#define TO_ENV_EOC 0x6B
+#define TO_ENV_LOOP 0x6C
 
 // TELEXi
 

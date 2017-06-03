@@ -13,8 +13,10 @@
 #include "Output.h"
 #include "Quantizer.h"
 #include "Oscillator.h"
+#include "TriggerOutput.h"
 
 #define RETRIGGERMS 5
+#define DACCENTER 32767
 
 // 50 microseconds per millisecond - 1000 / 50
 
@@ -29,6 +31,8 @@ class CVOutput : public Output
   
     CVOutput(int output, int led, DAC& dac, int samplingRate);
 
+    void ReferenceTriggers(TriggerOutput (*triggerOutputs[]), int count);
+
     // audio-rate update methid
     void Update();
 
@@ -36,6 +40,7 @@ class CVOutput : public Output
     void TargetValue(int value);
     void SetSlew(int slew, short format);
     void SetOffset(int value);
+    void SetLog(int value);
 
     // quantization
     void SetQuantizationScale(int scale);
@@ -59,6 +64,7 @@ class CVOutput : public Output
     void SetFrequencySlew(int slew, short format);
     void SetCycle(int value, short format);
     void TargetCycle(int value, short format);
+    void SetCenter(int value);
 
     void SetOscQuantizationScale(int scale);
     void SetQuantizedVOct(int value);
@@ -71,6 +77,10 @@ class CVOutput : public Output
     void SetDecay(int dec, short format);
     void SetEnvelopeMode(int mode);
     void TriggerEnvelope();
+    void SetLoop(int loopEnv);
+
+    void SetEOR(int trNumber);
+    void SetEOC(int trNumber);
 
     // reset
     void Reset();
@@ -131,6 +141,11 @@ class CVOutput : public Output
     Oscillator *_oscillator;
     bool _oscilMode = false;
 
+    void SharedOscil(int value);
+
+    int _dacCenter = DACCENTER;
+    int _oscilCenter = 0;
+
     int const _peak = DAC_MAX_SCALE - 32769;
 
     unsigned long _attack = 12;
@@ -145,6 +160,24 @@ class CVOutput : public Output
     bool _envelopeActive = false;
     bool _decaying = false;
     bool _retrigger = false;
+    bool _envLoop = false;
+    bool _infLoop = false;
+    int _loopTimes = -1;
+    int _loopCount = 0;
+
+    TriggerOutput **_triggerOutputs;
+    int _triggerOutputCount = 0;
+
+    bool _triggerEOR = false;
+    int _triggerForEOR = -1;
+    bool _triggerEOC = false;
+    int _triggerForEOC = -1;
+
+    bool _doLog = false;
+    uint8_t _logRange = 1;
+    bool _wasNg = false;
+    
+    
 };
 
 #endif

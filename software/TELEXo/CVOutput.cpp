@@ -9,6 +9,8 @@
 #include "TxHelper.h"
 #include "DAC7565.h"
 
+#include "ExpTable.h"
+
 /*
  * Constructor for Setting up the Output
  */
@@ -23,6 +25,12 @@ CVOutput::CVOutput(int output, int led, DAC& dac, int samplingRate) : Output(out
   _oscQuantizer = new Quantizer(0);
   // initialize the oscillator
   _oscillator = new Oscillator(_samplingRate);
+}
+
+
+void CVOutput::ReferenceTriggers(TriggerOutput (*triggerOutputs[]), int count){
+  _triggerOutputs = triggerOutputs;
+  _triggerOutputCount = count;
 }
 
 /*
@@ -80,7 +88,7 @@ void CVOutput::SetSlew(int value, short format){
  */
 void CVOutput::SetOffset(int value){
   // neutralize old offset and add new offset to target
-  _tempTarget = Constrain((_target >> 15) - _offset + value) << 15;
+  _tempTarget = Constrain(((_envelopeMode ? _envTarget : _target) >> 15) - _offset + value) << 15;
   // store the new offset
   _offset = value;
   _lOffset = _offset << 15;
@@ -99,6 +107,14 @@ void CVOutput::SetOffset(int value){
 }
 
 /*
+ * Sets the logarithmic translation mode
+ */
+void CVOutput::SetLog(int value){
+  _logRange = value - 1;
+  _doLog = value > 0;
+}
+
+/*
  * Stop Slew Activity and Jump to Target
  */
 void CVOutput::Kill(){
@@ -114,6 +130,7 @@ void CVOutput::Reset(){
   SetValue(0);
   SetSlew(0,0);
   SetQuantizationScale(0);
+  SetLog(0);
   
   SetFrequency(0);
   SetOscQuantizationScale(0);
@@ -122,10 +139,15 @@ void CVOutput::Reset(){
   SetRectify(0);
   SetWidth(50);
   SetFrequencySlew(0, 0);
+  SetCenter(0);
   
   SetEnvelopeMode(0);
   SetAttack(12, 0);
   SetDecay(250, 0);
+
+  SetEOR(-1);
+  SetEOC(-1);
+  SetLoop(1);
   
 }
 
@@ -179,19 +201,47 @@ void CVOutput::SetTimeFormat(int format){
 }
 
 /*
+ * Shared Function for Oscillator Setup
+ */
+void CVOutput::SharedOscil(int value){
+
+  // reset the phase if it isn't currently oscillation mode
+  if (!_oscilMode)
+    _oscillator->ResetPhase(_target);
+
+  // determine if we are enterign oscil mode
+  _oscilMode = value > 0;
+
+  // setup oscillation conditions or turn them off
+  if (_oscilMode) {
+     _dacCenter = DACCENTER - _oscilCenter;
+  } else {
+    _set = true;
+    _dacCenter = DACCENTER;
+  }
+    
+}
+
+/*
+ * Set the centerpoint for oscillation
+ */
+void CVOutput::SetCenter(int value){
+  _oscilCenter = value;
+  if (_oscilMode)
+     _dacCenter = DACCENTER - _oscilCenter;
+}
+
+/*
  * Sets the oscillation frequency in Hz
  */
 void CVOutput::SetFrequency(int freq){
 
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = freq > 0;
+  // call shared oscil setup function
+  SharedOscil(freq);
   
   if (_oscilMode)
     _oscillator->SetFrequency(freq);
-  else
-    _set = true;
+
 }
 
 /*
@@ -199,15 +249,12 @@ void CVOutput::SetFrequency(int freq){
  */
 void CVOutput::TargetFrequency(int freq){
 
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = freq > 0;
+  // call shared oscil setup function
+  SharedOscil(freq);
   
   if (_oscilMode)
     _oscillator->TargetFrequency(freq);
-  else
-    _set = true;
+
 }
 
 /*
@@ -216,16 +263,12 @@ void CVOutput::TargetFrequency(int freq){
  */
 void CVOutput::SetQuantizedVOct(int value){
 
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = value > 0;
+  // call shared oscil setup function
+  SharedOscil(value);
   
   if (_oscilMode)
     _oscillator->SetFloatFrequency(_quantizer->Quantize(value).Frequency);
-  else
-    _set = true;
-  
+
 }
 
 /*
@@ -234,15 +277,12 @@ void CVOutput::SetQuantizedVOct(int value){
  */
 void CVOutput::TargetQuantizedVOct(int value){
 
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = value > 0;
+  // call shared oscil setup function
+  SharedOscil(value);
   
   if (_oscilMode)
     _oscillator->TargetFloatFrequency(_quantizer->Quantize(value).Frequency);
-  else
-    _set = true;
+
 }
 
 /*
@@ -256,29 +296,25 @@ void CVOutput::SetFrequencySlew(int slew, short format){
  * Sets the oscillation frequency using the TT integer value
  */
 void CVOutput::SetVOct(int value){
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = value > 0;
+
+  // call shared oscil setup function
+  SharedOscil(value);
   
   if (_oscilMode)
     _oscillator->SetFloatFrequency(TxHelper::VOct2Frequency(value));
-  else
-    _set = true;
+
 }
 
 /*
  * Targets the oscillation frequency using the TT integer value
  */
 void CVOutput::TargetVOct(int value){
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = value > 0;
+
+  // call shared oscil setup function
+  SharedOscil(value);
+
   if (_oscilMode)
     _oscillator->TargetFloatFrequency(TxHelper::VOct2Frequency(value));
-  else
-    _set = true;
 }
 
 /*
@@ -286,8 +322,11 @@ void CVOutput::TargetVOct(int value){
  * (against the current quantized scale)
  */
 void CVOutput::SetOscNote(int note){
-   _oscilMode = true;
-   _oscillator->SetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
+
+  // call shared oscil setup function
+  SharedOscil(1);
+  
+  _oscillator->SetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
 }
 
 /*
@@ -295,26 +334,39 @@ void CVOutput::SetOscNote(int note){
  * (against the current quantized scale)
  */
 void CVOutput::TargetOscNote(int note){
-   _oscilMode = true;
-   _oscillator->TargetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
+
+  // call shared oscil setup function
+  SharedOscil(1);
+  
+  _oscillator->TargetFloatFrequency((_oscQuantizer->GetFrequencyForNote(note)));
 }
 
 /*
  * Sets the duration of a single cycle
  */
 void CVOutput::SetCycle(int value, short format){
-   _oscilMode = true;
-   value = TxHelper::ConvertMs(value, format);
-   _oscillator->SetFloatFrequency(1000. / value);
+
+  value = TxHelper::ConvertMs(value, format);
+  
+  // call shared oscil setup function
+  SharedOscil(value);
+
+  if (_oscilMode)
+    _oscillator->SetFloatFrequency(1000. / value);
 }
 
 /*
  * Targets the duration of a single cycle
  */
 void CVOutput::TargetCycle(int value, short format){
-   _oscilMode = true;
+
    value = TxHelper::ConvertMs(value, format);
-   _oscillator->TargetFloatFrequency(1000. / value);
+  
+  // call shared oscil setup function
+  SharedOscil(value);
+  
+  if (_oscilMode)
+    _oscillator->TargetFloatFrequency(1000. / value);
 }
 
 /*
@@ -338,30 +390,26 @@ void CVOutput::SetRectify(int mode){
  * Set the oscillator frequency in Millihertz (1 Hz = .001 mHz)
  */
 void CVOutput::SetLFO(int millihertz){
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = millihertz > 0;
+  
+  // call shared oscil setup function
+  SharedOscil(millihertz);
   
   if (_oscilMode)
     _oscillator->SetLFO(millihertz);
-  else
-    _set = true;
+
 }
 
 /*
  * Target the oscillator frequency in Millihertz (1 Hz = .001 mHz)
  */
 void CVOutput::TargetLFO(int millihertz){
-  if (!_oscilMode)
-    _oscillator->ResetPhase(_target);
-    
-  _oscilMode = millihertz > 0;
+
+  // call shared oscil setup function
+  SharedOscil(millihertz);
   
   if (_oscilMode)
     _oscillator->TargetLFO(millihertz);
-  else
-    _set = true;
+
 }
 
 /*
@@ -436,21 +484,23 @@ void CVOutput::SetEnvelopeMode(int mode){
       RecomputeEnvelopes();
     
     } else {
-    
+
       _target = _envTarget;
-    
+      _envLoop = false;
+      _envelopeActive = false;
     }
     
     _set = true;
   }
+
 }
 
 /*
  * Recomputes the Envlope Values
  */
 void CVOutput::RecomputeEnvelopes(){
-      SetAttack(_attack, 0);
-      SetDecay(_decay, 0);
+  _attackSlew = CalculateRawSlew(_attack, _envTarget, _lOffset);
+  _decaySlew = CalculateRawSlew(_decay, _lOffset, _envTarget);
 }
 
 /*
@@ -474,9 +524,45 @@ void CVOutput::TriggerEnvelope(){
       _slew = _attackSlew;
 
     }
+    if (!_envLoop && _loopTimes != 1){
+      _loopCount = 0;
+      _envLoop = true;
+    }
     _envelopeActive = true;
   }
   
+}
+
+/*
+ * Set the number of loops for the envelope (0 = inf)
+ */
+void CVOutput::SetLoop(int loopEnv){
+  _loopTimes = max(loopEnv, 0);
+  _infLoop = _loopTimes == 0;
+}
+
+/*
+ * Set the trigger for End of Rise (EOR)
+ */
+void CVOutput::SetEOR(int trNumber){
+  if (_triggerOutputCount > 0 && trNumber >= 0 && trNumber < _triggerOutputCount){
+    _triggerForEOR = trNumber;
+    _triggerEOR = true;
+  } else {
+    _triggerEOR = false;
+  }
+}
+
+/*
+ * Set the trigger for End of Cycle (EOC)
+ */
+void CVOutput::SetEOC(int trNumber){
+  if (_triggerOutputCount > 0 && trNumber >= 0 && trNumber < _triggerOutputCount){
+    _triggerForEOC = trNumber;
+    _triggerEOC = true;
+  } else {
+    _triggerEOC = false;
+  }
 }
    
 /*
@@ -486,7 +572,7 @@ void CVOutput::TriggerEnvelope(){
 void FASTRUN CVOutput::Update() {
 
   if (_set || _slew.Steps == 1){
-
+    
     _smallCurrent = _target >> 15;
     
     // set the CV directly (skipping any slew behavior)
@@ -496,7 +582,6 @@ void FASTRUN CVOutput::Update() {
     if (_envelopeActive){
 
       if (_retrigger) {
-        
          // do the attack
         _current = _lOffset;
         _target = _envTarget;
@@ -504,23 +589,38 @@ void FASTRUN CVOutput::Update() {
         _retrigger = false;
         
       } else {
-        
         // do the decay
         _envelopeActive = false;
         _target = _lOffset;
         _slew = _decaySlew;
         _decaying = true;
+
+        // pulse the EOR trigger (if set)
+        if (_envelopeMode && _triggerEOR)
+          _triggerOutputs[_triggerForEOR]->Pulse();
         
       }
       
     } else {
+
+      // pulse the EOC trigger (if set)
+      if (_envelopeMode && _decaying && _triggerEOC) 
+        _triggerOutputs[_triggerForEOC]->Pulse();
       
       // set the current to the target and turn off the set boolean
       _current = _target;
       _set = false; 
       _slew.Steps = 0;  
       _decaying = false;
-            
+
+      // retrigger if looping and loop count has replays left
+      if (_envLoop){
+        if (_infLoop || ++_loopCount < _loopTimes)
+          TriggerEnvelope();
+        else
+          _envLoop = false;
+      }
+      
     }
 
     _smallCurrent = _current >> 15;
@@ -551,6 +651,19 @@ void FASTRUN CVOutput::Update() {
  */
 void FASTRUN CVOutput::UpdateDAC(int value){
 
+  // do log translation
+  if (_doLog){
+    if (value < 0){
+      value *= -1;
+      _wasNg = true;
+    } else {
+      _wasNg = false;
+    }
+    value = ExpTable[constrain(value << _logRange, 0 , 32768)];
+    if (_wasNg) value *= -1;
+    value = value >> _logRange;
+  }
+
   // invert for DAC circuit
   if (_oscilMode)
     value = (int)(value * (_oscillator->Oscillate() / 32768.));
@@ -558,7 +671,7 @@ void FASTRUN CVOutput::UpdateDAC(int value){
   // added the conditional write only if the CV value changes
   if (value != _cvHelper){
     _cvHelper = value;
-    _dac.writeChannel(_output, (32767 - _cvHelper));
+    _dac.writeChannel(_output, (_dacCenter - _cvHelper));
   }  
   
 }

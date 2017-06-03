@@ -89,14 +89,38 @@ void TriggerOutput::SetDivision(int division){
   _divide = division > 1 ? true : false;
 }
 
+/*
+ * Set Clock Multiplier
+ */
+void TriggerOutput::SetMultiplier(int multiplier){
+   _tempMultiplication = max(multiplier, 1);
+   _tempMultiplyInterval = _metroInterval / _tempMultiplication;
+   _multiply = _tempMultiplication > 1;
+   // if turning off multiply during metro - schedule the next beat
+   if (!_multiply && _metro) _nextEvent = _nextNormal;
+}
+
+/*
+ * Activates or Deactivates the Metro for this Trigger at this Moment
+ */
+void TriggerOutput::SetMetro(int state) {
+  SetMetro(state, millis());
+}
+
+
 /**
  * Activates or Deactivates the Metro for this Trigger
  */
-void TriggerOutput::SetMetro(int state){
+void TriggerOutput::SetMetro(int state, unsigned long ms){
   bool m = state != 0;
   if (m){  
     _actualCount = _metroCount;
-    if (!_metro) Sync();
+    if (!_metro) {
+      Sync(ms);
+      _multiplyInterval = _tempMultiplyInterval;
+      _multiplication = _tempMultiplication;
+      _multiplyCount = 0;
+    }
   }
   _metro = m;
 }
@@ -106,6 +130,7 @@ void TriggerOutput::SetMetro(int state){
  */
 void TriggerOutput::SetMetroTime(int value, short format){
   _metroInterval = TxHelper::ConvertMs(value, format);
+  _tempMultiplyInterval = _metroInterval / _multiplication;
   if (_widthMode) SetWidth(_width);
 }
 
@@ -128,7 +153,16 @@ void TriggerOutput::SetMute(bool state){
  * Syncs the metro pulse to now
  */
 void TriggerOutput::Sync(){
-  _nextEvent = millis();
+  Sync(millis());
+}
+
+/**
+ * Syncs the metro pulse to a specified time
+ */
+void TriggerOutput::Sync(unsigned long syncTime){
+  _nextEvent = syncTime;
+  _nextNormal = syncTime;
+  _counter = 0;
 }
 
 
@@ -140,6 +174,7 @@ void TriggerOutput::Reset(){
   SetState(false);
   SetTime(100, 0);
   SetDivision(1);
+  SetMultiplier(1);
   SetMetro(0);
   SetMetroTime(1000,0);
   SetMetroCount(0);
@@ -160,6 +195,14 @@ void TriggerOutput::Kill(){
  */
 void FASTRUN TriggerOutput::Update(unsigned long currentTime){
 
+  /*
+   * _multiplication = number of dongises
+   * _multiply = bool ON or OFF
+   * _multiplyInterval
+    unsigned long _nextNormal = 0;
+    int _multiplyCount = 0;
+   */
+
   // turn off the pulse
   if (currentTime >= _toggle) {
     if (_state == _polarity)
@@ -169,10 +212,44 @@ void FASTRUN TriggerOutput::Update(unsigned long currentTime){
 
   // evaluate pinging the metro event
   if (_metro && currentTime >= _nextEvent){
-    if (_metroCount == 0 || (_metroCount > 0 && --_actualCount > 0))
-      _nextEvent = _nextEvent + _metroInterval;
-    else
-      _metro = false;
+
+    if (_multiply){
+
+      if (_multiplyCount == 0){
+        if (_metroCount == 0 || (_metroCount > 0 && --_actualCount > 0)){
+          // set the next reference beat (avoids divisionn drift)
+          _nextNormal = _nextNormal + _metroInterval;
+          // copy over any new values
+          _multiplyInterval = _tempMultiplyInterval;
+          _multiplication = _tempMultiplication;
+          // reset multiplication counter
+          _multiplyCount = 0;
+        } else {
+          // we have beat for the expected count - disable the metro
+          _metro = false;
+        }
+      }
+      
+      if (++_multiplyCount < _multiplication) {
+        // set the next event to the multiply interval
+        _nextEvent = _nextEvent + _multiplyInterval;
+      } else {
+        // set the next event to the metro interval (normal) and reset count
+        _nextEvent = _nextNormal;
+        _multiplyCount = 0;
+      }
+      
+    } else {
+
+      // we are just doing basic metronomes
+      if (_metroCount == 0 || (_metroCount > 0 && --_actualCount > 0)){
+        _nextEvent = _nextNormal + _metroInterval;
+        _nextNormal = _nextEvent;
+      } else
+        _metro = false;
+      
+    }
+      
     Pulse();
   }
   

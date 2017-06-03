@@ -29,13 +29,16 @@ class TriggerOutput : public Output
     void SetWidth(int value);
     
     void SetDivision(int division);
+    void SetMultiplier(int multiplier);
 
     void SetMetro(int state);
+    void SetMetro(int state, unsigned long syncTime);
     void SetMetroTime(int value, short format);
     void SetMetroCount(int value);
 
     void SetMute(bool state);
     
+    void Sync(unsigned long syncTime);
     void Sync();
     void Reset();
 
@@ -53,6 +56,14 @@ class TriggerOutput : public Output
     bool _divide = false;
     unsigned short _division = 0;
     unsigned short _counter = 0;
+
+    bool _multiply = false;
+    unsigned short _multiplication = 1;
+    unsigned short _tempMultiplication = 1;
+    unsigned long _multiplyInterval = 1000;
+    unsigned long _tempMultiplyInterval = 1000;
+    unsigned long _nextNormal = 0;
+    int _multiplyCount = 0;
 
     bool _metro = false;
     unsigned long _metroInterval = 1000;
