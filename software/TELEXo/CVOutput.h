@@ -94,7 +94,7 @@ class CVOutput : public Output
     
   protected:
 
-    static int _ledMap[256];
+    static const uint8_t _ledMap[256];
     
   private:
 

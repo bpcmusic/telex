@@ -92,13 +92,10 @@ bool dacOn = true;
  */
 void setup() {
 
-  delay(1);
-
   // config
   int cfg = 0;
   for (i=0; i < 3; i++){
     pinMode(configPins[i], INPUT);
-    delay(1);
     cfg += digitalRead(configPins[i]) << i;
   }
   configID += cfg;  
@@ -106,6 +103,7 @@ void setup() {
   writeRate = 1000000 / SAMPLINGRATE;
 
 #ifdef DEBUG
+  delay(225);
   // set the behind-the-scenes LED output pin
   pinMode(LED, OUTPUT);
   // turn on serial
@@ -114,6 +112,7 @@ void setup() {
   while (!Serial);
   // kick off the logging
   t = millis() + LOGINTERVAL;
+  Serial.printf("NOW: %d\n", millis());
   Serial.printf("ConfigID: %d\n", configID);
 #endif
     
@@ -140,7 +139,6 @@ void setup() {
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
 
-  
 }
 
 /*
