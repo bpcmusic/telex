@@ -16,9 +16,13 @@ The TELEXo (or TXo) is an output expander and the TELEXi (or TXi) is an input ex
 
 ## Teletype Firmware
 
-Make sure you have the latest [Teletype Firmware](https://github.com/monome/teletype) to ensure that your Teletype supports the command set for the TELEX modules. This is a part of the core Teletype release as of 23 February 2017. 
+We recommend the Teletype 2.0 BETA at this point. You can get it from this forum:
 
-Experimental Teletype Firmware Updates will be posted in the [TELEX Teletype Fork](https://github.com/bpcmusic/teletype) from time to time.
+https://llllllll.co/t/teletype-2-0-beta-release-candidate-1-released-6th-june-2017/6939?u=bpcmusic
+
+It is the bomb.
+
+You can always head to Monome for the latest [Official Teletype Firmware](https://github.com/monome/teletype).
 
 ## TELEX Firmware
 
@@ -31,6 +35,17 @@ Compiling the TELEX firmware is done using the [Arduino Development Environment]
 Several additional libraries are included in the project due to the Arduino IDE's wonderful linking capabilities.
 
 	IMPORTANT: overclock your Teensy to 120 MHz in the IDE
+
+
+### Critical Startup Optimization for Compilation
+	
+If you want your TELEX to be ready when your Teletype has booted and is sending out the `I` script for the program that it is loading at startup, you need to make a change to the Teensy file "pins_teensy.c" in your Arduino hardware folder. For my mac, this is inside of the Arduino application package in:
+
+`Contents\Java\hardware\teensy\avr\cores\teensy3\pins_teensy.c`
+
+Line 585 has the value `delay(400)`; reduce this to an amount of delay that is appropriate for you needed startup time. For the official firmware, we set this to `delay(175)` which should be more than enough to beat the fast-loading, 2.0 firmware to the ready.
+
+For now, we edit this in-place. I know. We shuddered too. But, that seems to be the best way to make the change. Remember, you need to change it back for any other Arduino compilation you plan to do as it may have the device ready before all of your related components are - including the Teensy's USB interface.
 
 ## TELEX Command Reference
 
