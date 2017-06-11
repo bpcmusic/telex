@@ -26,6 +26,30 @@ You can always head to Monome for the latest [Official Teletype Firmware](https:
 
 ## TELEX Firmware
 
+Download the latest TELEX firmware from the releases section of this site:
+
+https://github.com/bpcmusic/telex/releases
+
+### Installing Your Firmware
+
+
+> **DO NOT POWER YOUR MODULE WHILE CONNECTING THE TEENSY VIA USB TO YOUR COMPUTER - THIS WOULD BE VERY BAD**
+
+Ok. With that out of the way, here are some simple steps.
+
+Firmware is loaded on the Teensy processor that piggybacks on the underside of your module. Doing so is pretty simple.
+
+1. Download the Teensy Loader application for your operating system from https://www.pjrc.com/teensy/loader.html (if you don't have it already)
+2. Download and unzip the latest TELEX firmware from https://github.com/bpcmusic/telex/releases
+3. (optional) Carefully remove the Teensy from your module
+4. Connect the Teensy to your computer via USB
+5. Use your operating system specific instructions for the Teensy Loader to open the appropriate firmware in the Teensy loader and program it on your Teensy
+6. Disconnect the Teensy from USB when the firmware has been loaded
+7. Reattach the Teensy to your module if you removed it
+8. Party.
+
+### Compiling Your Own Firmware
+
 Compiling the TELEX firmware is done using the [Arduino Development Environment](https://www.arduino.cc/en/Main/Software) and a few extensions.
 
 * [Arduino Development Environment](https://www.arduino.cc/en/Main/Software)
@@ -54,7 +78,11 @@ Reference documents for the commands supported by the TXo and TXi are located he
 * [Markdown Command Reference with Extra Descriptions](commands.md)
 * [Printable Command Reference](extras/TELEX%20Command%20Reference.pdf)
 
+The documents are a little behind the latest firmware; we're moving all operator definitions into the 2.0 documentation system which **is** up to date.
 
+The latests ops are mentioned in this forum post, if you are curious. You need the 2.0 beta firmware (mentioned above) to access them.
+
+https://llllllll.co/t/telex-teletype-expanders/1379/609?u=bpcmusic
 
 ## TELEXo
 
