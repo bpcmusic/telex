@@ -23,8 +23,8 @@ TriggerOutput::TriggerOutput(int output, int led) : Output(output, led) {
  */
 void TriggerOutput::SetState(bool state){
   _state = state;
-  digitalWrite(_output, _state ? HIGH : LOW);
-  digitalWrite(_led, _state ? HIGH : LOW);
+  digitalWriteFast(_output, _state ? HIGH : LOW);
+  digitalWriteFast(_led, _state ? HIGH : LOW);
 }
 
 /*

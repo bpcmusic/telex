@@ -6,6 +6,7 @@
  
 #include "Arduino.h"
 #include "AnalogReader.h"
+#include "PitchDetector.h"
 
 /*
  * simple constructor for unipolar things (like pots)
@@ -28,19 +29,44 @@ AnalogReader::AnalogReader(int address, bool reverse){
 }
 
 /*
+ * function for tracking of triggers going to input
+ */
+void AnalogReader::TriggerTracker(){
+
+  if (_state && (_pulsePolarity ? _readValue < LOWTRIGGER : _readValue > HIGHTRIGGER)) {
+    
+    // PULSE END TRACKING
+    _state = false;
+    _pulseDuration = ((long)_timeSinceLastPulse + PULSEROUNDING) / 1000;
+    Serial.printf("flip down; duration: %d;\n", _pulseDuration);
+  
+  } else if (!_state && (_pulsePolarity ? _readValue > HIGHTRIGGER : _readValue < LOWTRIGGER)) {
+
+    // PULSE START TRACKING
+    _state = true;
+    _pulseDistance = ((long)_timeSinceLastPulse + PULSEROUNDING) / 1000;
+    _timeSinceLastPulse = 0;
+    Serial.printf("flip up; distance: %d\n", _pulseDistance);
+    
+  }
+}
+
+/*
  *  reads the analog input
  */
 int FASTRUN AnalogReader::Read() {
   // read the value from the pin
   _readValue = analogRead(_address);
-
+  
   // shift it, flip it and reverse it (_reverse is for CV)
   _readValue = _readValue << (_reverse ? 2 : 1);
   if (_reverse) _readValue = 16383 - _readValue;
 
+  if (_reverse) TriggerTracker();
+
   // smoothing to iron out the bumps
   _smoothedValue = Smooth(_readValue, _smoothedValue);
-  _readValue = (int)(_smoothedValue + .5);
+  _readValue = (int)_smoothedValue;
 
   // store into a circular buffer (for calibration)
   _readBuffer[_bufferIndex++] = _readValue;

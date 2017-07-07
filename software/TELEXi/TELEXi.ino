@@ -1,6 +1,6 @@
 /*
  * TELEXi Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016-7 Brendon Cassidy
  * MIT License
  */
  
@@ -21,6 +21,12 @@
  * Ugly Globals
  */
 
+// sampling rate and control rate
+#define SAMPLINGRATE 20000
+#define KRATE 4000
+
+// writeRate = 1000000 / SAMPLINGRATE;
+
 // i2c pullup setting
 bool enablePullups = false;
 
@@ -40,8 +46,11 @@ int volatile inputValue[8];
 int volatile quantizedValue[8];
 int volatile quantizedNote[8];
 
+int readCounter[8];
+
 // read timer and its local variables
-IntervalTimer readTimer;
+IntervalTimer inTimer;
+IntervalTimer potTimer;
 int p = 0;
 
 // quantizers and quantizer state
@@ -74,7 +83,7 @@ void setup() {
   int cfg = 0;
   for (i=0; i < 3; i++){
     pinMode(configPins[i], INPUT);
-    cfg += digitalRead(configPins[i]) << i;
+    cfg += digitalReadFast(configPins[i]) << i;
   }
   configID += cfg;  
 
@@ -98,6 +107,7 @@ void setup() {
     analogReaders[i] = new AnalogReader(inputs[i], i >= 4);
     inputValue[i] = 0;
     quant[i] = new Quantizer(0);
+    readCounter[i] = 0;
   }
 
   // read the calibration data from EEPROM
@@ -109,7 +119,8 @@ void setup() {
 #endif
 
   // start the read timer
-  readTimer.begin(readInputs, 500);
+  inTimer.begin(readInputs, 1000000 / KRATE);
+  potTimer.begin(readPots, 1000000 / KRATE);
 
   // enable i2c and connect the event callbacks
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400 // I2C_PULLUP_EXT
@@ -125,7 +136,7 @@ void setup() {
  */
 void readInputs(){
   // loop through the 8 inputs and store the latest value 
-  for (p=0; p < 8; p++){
+  for (p=4; p < 8; p++){
     inputValue[p] = analogReaders[p]->Read();
     // handle the quantized response
     qresponse = quant[p]->Quantize(inputValue[p]);
@@ -133,6 +144,22 @@ void readInputs(){
     quantizedNote[p] = qresponse.Note;
   }
 }
+/*
+ * the read input timer interrupt
+ * need to be careful with what we access and do here
+ * this function is pushing it with the quantization and stuff
+ */
+void readPots(){
+  // loop through the 4 pots and store the latest value 
+  for (p=0; p < 4; p++){
+    inputValue[p] = analogReaders[p]->Read();
+    // handle the quantized response
+    qresponse = quant[p]->Quantize(inputValue[p]);
+    quantizedValue[p] = qresponse.Value;
+    quantizedNote[p] = qresponse.Note;
+  }
+}
+
 
 /*
  * a simple debugging print loop - all other actions happen in the callbacks and timers
@@ -165,7 +192,7 @@ void receiveEvent(size_t len) {
 
 #ifdef DEBUG
   // set LED active to indicate data transfer
-  digitalWrite(LED, HIGH);
+  digitalWriteFast(LED, HIGH);
   ledOn = true;
   ledInterval = millis() + LEDINTERVAL;
 #endif
