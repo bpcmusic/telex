@@ -54,7 +54,6 @@ int pwmLedPins[] = { 3,4,5,6 };
 CVOutput *cvOutputs[4];
 int writeRate = 100;
 
-
 // Trigger Outputs
 int trLedPins[] = { 0,1,2,7 };
 int trPins[] = { 23, 22, 21, 20 };
@@ -139,6 +138,15 @@ void setup() {
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
 
+  // teensy 3.6 init tests
+  /*
+  unsigned long ms = millis();
+  triggerOutputs[0]->SetMetroTime(120, 3); 
+  triggerOutputs[0]->SetMetro(1, ms);
+  
+  cvOutputs[0]->SetValue(16384 << 1);
+  cvOutputs[0]->SetFrequency(440);  
+  */
 }
 
 /*

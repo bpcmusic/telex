@@ -8,6 +8,7 @@
 #define AnalogReader_h
 
 #include "Arduino.h"
+#include <ResponsiveAnalogRead.h>
 
 #define TOP 16383
 #define BOTTOM -16384
@@ -40,15 +41,10 @@ class AnalogReader
     int _address;
     bool _reverse = false;
     
+    ResponsiveAnalogRead *_analog;
+    
     int volatile _readValue;
     int volatile _latestValue;
-    
-    int volatile _readBuffer[16];
-    int volatile _bufferIndex = 0;
-
-    float Smooth(int value, float previousValue);
-    float _c = .985;
-    int volatile _smoothedValue = 0.;
     
     int Scale(int value);
     int _calibrationData[3];
@@ -58,7 +54,6 @@ class AnalogReader
     int _top = TOP;
     int _bottom = BOTTOM;
     
-  
     int _i;
     
 };

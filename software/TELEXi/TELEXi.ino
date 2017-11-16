@@ -1,6 +1,6 @@
 /*
  * TELEXi Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016, 2017 Brendon Cassidy
  * MIT License
  */
  
@@ -29,7 +29,7 @@ int configPins[] = { 2, 1, 0 };
 int configID = TI;
 
 // logging in the loop
-#define LOGINTERVAL 1000
+#define LOGINTERVAL 250 // 1000
 #define LEDINTERVAL 1000
 
 // inputs, readers and storage
@@ -80,7 +80,7 @@ void setup() {
 
   // TELEXi uses the standard Teensy analog inputs which have 13 bit usable resolution
   // will return 16 - but it is filled with noise in the latter bits (as opposed to zeros)
-  analogReadResolution(13);
+  analogReadResolution(16);
 
   // debugging nonsense
 #ifdef DEBUG

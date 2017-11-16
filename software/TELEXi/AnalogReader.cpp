@@ -7,6 +7,8 @@
 #include "Arduino.h"
 #include "AnalogReader.h"
 
+#include <ResponsiveAnalogRead.h>
+
 /*
  * simple constructor for unipolar things (like pots)
  */
@@ -22,6 +24,9 @@ AnalogReader::AnalogReader(int address, bool reverse){
   _reverse = reverse;
   if (!_reverse) _bottom = 0;
   
+  _analog = new ResponsiveAnalogRead(0, false);
+  _analog->setAnalogResolution(1<<13);
+  
   _calibrationData[0] = -16384;
   _calibrationData[1] = 0;
   _calibrationData[2] = 16383;
@@ -32,19 +37,13 @@ AnalogReader::AnalogReader(int address, bool reverse){
  */
 int FASTRUN AnalogReader::Read() {
   // read the value from the pin
-  _readValue = analogRead(_address);
+  _readValue = analogRead(_address) >> 3;
+  _analog->update(_readValue);
+  _readValue = _analog->getValue();
 
   // shift it, flip it and reverse it (_reverse is for CV)
   _readValue = _readValue << (_reverse ? 2 : 1);
   if (_reverse) _readValue = 16383 - _readValue;
-
-  // smoothing to iron out the bumps
-  _smoothedValue = Smooth(_readValue, _smoothedValue);
-  _readValue = (int)(_smoothedValue + .5);
-
-  // store into a circular buffer (for calibration)
-  _readBuffer[_bufferIndex++] = _readValue;
-  if (_bufferIndex >= 16) _bufferIndex = 0;
   
   // scale if this input is actively calibrated
   if (_calibrated) _readValue = Scale(_readValue);
@@ -107,10 +106,8 @@ void AnalogReader::Calibrate(int measure){
     // set this reader as calibrated
     _calibrated = true;
 
-    // average the read buffer
-    int value = 0;
-    for (_i=0; _i < 16; _i++) value += _readBuffer[_i];
-    value = value / 16;
+    // pull the accumulated value
+    int value = _analog->getValue();
 
     // set the calibration data
     // removed value protections so that fun things can be done with scaling
@@ -156,12 +153,4 @@ int FASTRUN AnalogReader::Scale(int value) {
   
   return value;
 }
-
-/*
- * low pass filter trick (thx tom erbe)
- */
-float FASTRUN AnalogReader::Smooth(int value, float previousValue) {
-  return ((value + .5) * (1. - _c)) + (previousValue * _c);
-}
-
 
