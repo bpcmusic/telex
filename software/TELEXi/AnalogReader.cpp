@@ -108,6 +108,12 @@ void AnalogReader::Calibrate(int measure){
 
     // pull the accumulated value
     int value = _analog->getValue();
+    
+    // flip and reverse
+    value = value << (_reverse ? 2 : 1);
+    if (_reverse) value = 16383 - value;
+
+    // Serial.printf("CALIB [%d][[%d]]: %d\n", _address, measure, value);
 
     // set the calibration data
     // removed value protections so that fun things can be done with scaling

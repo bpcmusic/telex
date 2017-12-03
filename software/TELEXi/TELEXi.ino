@@ -109,7 +109,7 @@ void setup() {
 #endif
 
   // start the read timer
-  readTimer.begin(readInputs, 500);
+  readTimer.begin(readInputs, 1000); // 500
 
   // enable i2c and connect the event callbacks
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400 // I2C_PULLUP_EXT
