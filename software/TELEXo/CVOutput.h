@@ -1,6 +1,6 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016, 2017 Brendon Cassidy
  * MIT License
  */
  
@@ -42,6 +42,10 @@ class CVOutput : public Output
     void SetOffset(int value);
     void SetLog(int value);
 
+    int Calibrate();
+    void ResetCalibration();
+    void SetCalibrationValue(int value);
+
     // quantization
     void SetQuantizationScale(int scale);
     void SetQuantizedValue(int value);
@@ -81,6 +85,8 @@ class CVOutput : public Output
 
     void SetEOR(int trNumber);
     void SetEOC(int trNumber);
+
+    void SetENV(int value);
 
     // reset
     void Reset();
@@ -122,6 +128,11 @@ class CVOutput : public Output
     int _offset = 0;
     long _lOffset = 0;
 
+    int _calibration = 0;
+
+    int _zero = 0;
+    long _lZero = 0;
+
     int _ledHelper;
     volatile bool _updateLED = false;
     
@@ -154,7 +165,8 @@ class CVOutput : public Output
     SlewSteps _attackSlew;
     SlewSteps _decaySlew;
     SlewSteps _retriggerSlew;
-    
+
+    bool _envelopeState = false;
     bool _envelopeMode = false;
     long _envTarget = 0;
     bool _envelopeActive = false;

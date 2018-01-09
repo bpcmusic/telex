@@ -1,4 +1,9 @@
-
+/*
+ * TELEXo Eurorack Module
+ * (c) 2016, 2017 Brendon Cassidy
+ * MIT License
+ */
+ 
 #ifndef ExpTable_h
 #define ExpTable_h
 

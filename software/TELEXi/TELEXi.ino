@@ -74,7 +74,12 @@ void setup() {
   int cfg = 0;
   for (i=0; i < 3; i++){
     pinMode(configPins[i], INPUT);
-    cfg += digitalRead(configPins[i]) << i;
+    // can't do a digital read cuz some idiot had the pins floating
+    // needed to do this cuz of the dumb way i designed the board
+    // embarassing to have this be one of the first things in the code
+    // (hiding my head in shame)
+    int cRead = analogRead(configPins[i]) > 1000 ? 1 : 0;
+    cfg += cRead << i;
   }
   configID += cfg;  
 

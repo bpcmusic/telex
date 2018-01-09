@@ -51,7 +51,7 @@ int FASTRUN AnalogReader::Read() {
   // map it (if we are mapping values)
   if (_map){
     // Serial.printf("MAP %d",_readValue);
-    _readValue = map(_readValue, _reverse ? BOTTOM : 0, TOP, _bottom, _top+1);
+    _readValue = map(_readValue, _reverse ? BOTTOM : 0, TOP, _bottom, _top);
     // Serial.printf(" = %d\n",_readValue);
   }
 

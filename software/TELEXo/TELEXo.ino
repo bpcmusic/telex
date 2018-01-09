@@ -12,6 +12,9 @@
 // i2c Wire Library (for Teensy)
 #include <i2c_t3.h>
 
+// eeprom library
+#include <EEPROM.h>
+
 // DAC stuff
 #include <SPI.h>
 #include "DAC7565.h"
@@ -90,12 +93,17 @@ bool dacOn = true;
  * Setup Function 
  */
 void setup() {
-
+  
   // config
   int cfg = 0;
   for (i=0; i < 3; i++){
     pinMode(configPins[i], INPUT);
-    cfg += digitalRead(configPins[i]) << i;
+    // can't do a digital read cuz some idiot had the pins floating
+    // needed to do this cuz of the dumb way i designed the board
+    // embarassing to have this be one of the first things in the code
+    // (hiding my head in shame)
+    int cRead = analogRead(configPins[i]) > 1000 ? 1 : 0;
+    cfg += cRead << i;
   }
   configID += cfg;  
   
@@ -130,6 +138,9 @@ void setup() {
     cvOutputs[i]->ReferenceTriggers(triggerOutputs, sizeof(triggerOutputs));
   }
 
+  // read the calibration data
+  readCalibrationData();
+
   // start the write timer
   writeTimer.begin(writeOutputs, writeRate);
   kTime = millis() + LEDRATE;
@@ -137,16 +148,6 @@ void setup() {
   // initialize the teensy optimized wire library
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
-
-  // teensy 3.6 init tests
-  /*
-  unsigned long ms = millis();
-  triggerOutputs[0]->SetMetroTime(120, 3); 
-  triggerOutputs[0]->SetMetro(1, ms);
-  
-  cvOutputs[0]->SetValue(16384 << 1);
-  cvOutputs[0]->SetFrequency(440);  
-  */
 }
 
 /*
@@ -247,7 +248,6 @@ void actOnCommand(byte cmd, byte out, int value){
 
   unsigned long ms = millis();
   
-  // noInterrupts();
   switch(cmd) {
     
     case TO_CV_SET:
@@ -650,9 +650,90 @@ void actOnCommand(byte cmd, byte out, int value){
           cvOutputs[w]->Reset();
        }
       break;
+
+    case TO_CV_CALIB:
+      // turns the current value and offest into a permanent offset
+      writeCalibrationValue(targetOutput, cvOutputs[targetOutput]->Calibrate());
+      break;
+      
+    case TO_CV_RESET:
+      // returns the permanent offset to 0
+      cvOutputs[targetOutput]->ResetCalibration();
+      writeCalibrationValue(targetOutput, 0);
+      break;
+      
+    case TO_ENV:
+      // gates the envelope on and off
+      cvOutputs[targetOutput]->SetENV(value);
+      break;
+      
     
   }
-  // interrupts();
+
 }
 
+/*
+ * Writes the calibration data to the Teensy's EEPROM
+ */
+void writeCalibrationValue(int index, int value){
+  #ifdef DEBUG
+  Serial.printf("writing calibration for CV[%d] = %d\n", index, value);
+  #endif  
+  int address = 4 + (2 * index);
+  uint16_t uInt16t = (uint16_t)value;
+  byte one = uInt16t & 255;
+  byte two = uInt16t >> 8;
+  if (EEPROM.read(address) != one) EEPROM.write(address, one);
+  if (EEPROM.read(++address) != two) EEPROM.write(address, two);  
+}
 
+/*
+ * reads the calibration data from the Teensy's EEPROM
+ */
+void readCalibrationData(){
+  
+  #ifdef DEBUG
+  Serial.print("checking for calibration data\n");
+  #endif  
+  
+  int rPos = 0;
+
+  uint16_t uInt16t = 0;
+  
+  // Look for the TXo Tag
+  // "TXo "
+  if (EEPROM.read(rPos++) == 84 && EEPROM.read(rPos++) == 88 && EEPROM.read(rPos++) == 111 && EEPROM.read(rPos++) == 32) {
+  
+    #ifdef DEBUG
+    Serial.print("TXo data island found; reading calibration data\n");
+    #endif  
+   
+    for (int i=0; i < 4; i++) {
+      uInt16t = EEPROM.read(rPos) + (EEPROM.read(rPos + 1) << 8);
+      rPos += 2;
+      #ifdef DEBUG
+      Serial.printf("CV[%d]: %d\n", i, (int16_t)uInt16t);
+      #endif  
+      cvOutputs[i]->SetCalibrationValue((int16_t)uInt16t);
+    }
+  
+  } else {
+    
+    #ifdef DEBUG
+    Serial.print("initializing eeprom\n");
+    #endif
+    
+    rPos = 0;
+    // "TXo "
+    EEPROM.write(rPos++, 84);
+    EEPROM.write(rPos++, 88);
+    EEPROM.write(rPos++, 111);
+    EEPROM.write(rPos++, 32);
+    
+    // initialize zeros for the four values we store
+    for (int i=0; i<8; i++){
+      EEPROM.write(rPos++, 0);
+    }
+  }
+  
+}

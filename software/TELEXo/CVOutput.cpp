@@ -1,6 +1,6 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016, 2017 Brendon Cassidy
  * MIT License
  */
  
@@ -25,9 +25,13 @@ CVOutput::CVOutput(int output, int led, DAC& dac, int samplingRate) : Output(out
   _oscQuantizer = new Quantizer(0);
   // initialize the oscillator
   _oscillator = new Oscillator(_samplingRate);
+  // re-initialize using the reset command (to keep things the same at start-up as on init)
+  Reset();
 }
 
-
+/*
+ * Creates a link between this CV output and a particular trigger output (for EOR/EOF envelope triggers)
+ */
 void CVOutput::ReferenceTriggers(TriggerOutput (*triggerOutputs[]), int count){
   _triggerOutputs = triggerOutputs;
   _triggerOutputCount = count;
@@ -38,7 +42,7 @@ void CVOutput::ReferenceTriggers(TriggerOutput (*triggerOutputs[]), int count){
  */
 void CVOutput::SetValue(int value){
   // target is the delivered value plus the configured offset
-  _tempTarget = Constrain(value + _offset) << 15;
+  _tempTarget = Constrain(value + (_offset + _calibration)) << 15;
   if (_envelopeMode){
     if (_envTarget != _tempTarget) {
       _envTarget = _tempTarget;
@@ -56,7 +60,7 @@ void CVOutput::SetValue(int value){
  */
 void CVOutput::TargetValue(int value){
   // target is the delivered value plus the configured offset
-  _tempTarget = Constrain(value + _offset) << 15;
+  _tempTarget = Constrain(value + (_offset + _calibration)) << 15;
   if (_envelopeMode){
     if (_envTarget != _tempTarget) {
       _envTarget = _tempTarget;
@@ -91,7 +95,7 @@ void CVOutput::SetOffset(int value){
   _tempTarget = Constrain(((_envelopeActive ? _envTarget : _target) >> 15) - _offset + value) << 15;
   // store the new offset
   _offset = value;
-  _lOffset = _offset << 15;
+  _lOffset = (_offset + _calibration) << 15;
   
   if (_envelopeMode){
     if (_envTarget != _tempTarget) {
@@ -99,11 +103,66 @@ void CVOutput::SetOffset(int value){
       RecomputeEnvelopes();
     }
   } else {
+    // Serial.printf("target: %d; slew time: %d\n", _tempTarget, _slewTime);
     _target = _tempTarget;
-     // if slewing - calculate a new slew value
-    if (_slewTime != 0) CalculateSlewValue();
+     // if slewing - calculate a new slew value; else set the offset directly
+    if (_slewTime != 0) 
+      CalculateSlewValue();
+    else
+      _set = true;
   }
 
+}
+
+/*
+ * Calibrates the output by making the current offset permanent
+ * Returns the calibration value for storage
+ */
+int CVOutput::Calibrate(){
+  _calibration = _offset + _calibration;
+  _offset = 0;
+  // Serial.printf("calibration: %d; Offset: %d\n", _calibration, _offset);
+
+  return _calibration;
+}
+
+/*
+ * Resets the calibration value to 0 and resets the output
+ */
+void CVOutput::ResetCalibration(){
+  
+  // neutralize old calibration (ug) and add new offset to target
+  _tempTarget = Constrain(((_envelopeActive ? _envTarget : _target) >> 15) - _calibration) << 15;
+  _lOffset = _offset << 15;
+  
+  // Serial.printf("target: %d; temptarget: %d\n", _target, _tempTarget);
+
+  // nuke the calibration
+  _calibration = 0;
+  // Serial.printf("calibration: %d; Offset: %d\n", _calibration, _offset);
+
+  if (_envelopeMode){
+    if (_envTarget != _tempTarget) {
+      _envTarget = _tempTarget;
+      RecomputeEnvelopes();
+    }
+  } else {
+    _target = _tempTarget;
+     // if slewing - calculate a new slew value; else set the offset directly
+    if (_slewTime != 0) 
+      CalculateSlewValue();
+    else
+      _set = true;
+  }
+  
+}
+
+/*
+ * Sets the calibration to a particular value (used by the start-up procedure)
+ */
+void CVOutput::SetCalibrationValue(int value){
+  SetOffset(value);
+  Calibrate();
 }
 
 /*
@@ -128,7 +187,7 @@ void CVOutput::Kill(){
 void CVOutput::Reset(){
   SetOffset(0);
   SetValue(0);
-  SetSlew(0,0);
+  SetSlew(1,0);
   SetQuantizationScale(0);
   SetLog(0);
   
@@ -553,6 +612,16 @@ void CVOutput::TriggerEnvelope(){
 }
 
 /*
+ * Sets the envelope state to trigger attack (1) or decay (0)
+ * Attack triggers the envelope; decay allows the decay (but does not retrigger)
+ */
+void CVOutput::SetENV(int value){
+  bool newState = value > 0;
+  if (newState) TriggerEnvelope();
+  _envelopeState = newState;
+}
+
+/*
  * Set the number of loops for the envelope (0 = inf)
  */
 void CVOutput::SetLoop(int loopEnv){
@@ -607,7 +676,7 @@ void FASTRUN CVOutput::Update() {
         _slew = _attackSlew;
         _retrigger = false;
         
-      } else {
+      } else if (!_envelopeState) {
         // do the decay
         _envelopeActive = false;
         _target = _lOffset;
@@ -618,6 +687,8 @@ void FASTRUN CVOutput::Update() {
         if (_envelopeMode && _triggerEOR)
           _triggerOutputs[_triggerForEOR]->Pulse();
         
+      } else if (_envelopeState) {
+        _updateLED = false;
       }
       
     } else {
@@ -741,7 +812,9 @@ int CVOutput::Constrain(int value){
   return constrain(value, -32768, 32767);
 }
 
-
+/*
+ * Used to make the LEDs visible over a wider range of CV values
+ */
 const uint8_t CVOutput::_ledMap[] = {
   0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
   0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,

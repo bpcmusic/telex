@@ -1,6 +1,6 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016 Brendon Cassidy
+ * (c) 2016, 2017 Brendon Cassidy
  * MIT License
  */
  
@@ -58,7 +58,7 @@
 #define TO_M_COUNT 0x1E
 
 #define TO_KILL 0x20
-#define TO_RESET 0x21
+// #define TO_RESET 0x21
 #define TO_TR_INIT 0x22
 #define TO_CV_INIT 0x23
 #define TO_INIT 0x24
@@ -113,6 +113,11 @@
 #define TO_ENV_EOR 0x6A
 #define TO_ENV_EOC 0x6B
 #define TO_ENV_LOOP 0x6C
+
+#define TO_ENV 0x6D
+
+#define TO_CV_CALIB 0x6E
+#define TO_CV_RESET 0x6F
 
 // TELEXi
 
