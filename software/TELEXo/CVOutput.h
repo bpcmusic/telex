@@ -29,7 +29,7 @@ class CVOutput : public Output
 {
   public:
   
-    CVOutput(int output, int led, DAC& dac, int samplingRate);
+    CVOutput(int output, int led, DAC& dac);
 
     void ReferenceTriggers(TriggerOutput (*triggerOutputs[]), int count);
 
@@ -105,11 +105,6 @@ class CVOutput : public Output
   private:
 
     void RecomputeEnvelopes();
-
-    int _samplingRate = 20000;
-    int _krate = 20;
-
-    // int _intcurrent = 0;
     
     volatile long _current = 0;
     long _target = 0;
@@ -177,6 +172,8 @@ class CVOutput : public Output
     int _loopTimes = -1;
     int _loopCount = 0;
 
+    bool _peakLED = false;
+
     TriggerOutput **_triggerOutputs;
     int _triggerOutputCount = 0;
 
@@ -188,8 +185,6 @@ class CVOutput : public Output
     bool _doLog = false;
     uint8_t _logRange = 1;
     bool _wasNg = false;
-    
-    
 };
 
 #endif

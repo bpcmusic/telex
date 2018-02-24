@@ -1,9 +1,10 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016, 2017 Brendon Cassidy
+ * (c) 2016-2018 Brendon Cassidy
  * MIT License
  */
  
+#include "defines.h"
 #include "Arduino.h"
 #include "CVOutput.h"
 #include "TxHelper.h"
@@ -14,17 +15,14 @@
 /*
  * Constructor for Setting up the Output
  */
-CVOutput::CVOutput(int output, int led, DAC& dac, int samplingRate) : Output(output, led){
+CVOutput::CVOutput(int output, int led, DAC& dac) : Output(output, led){
   // store the DAC reference
   _dac = dac;
-  // sampling rate
-  _samplingRate = samplingRate;
-  _krate = _samplingRate / 1000;
   // initialize the Quantizers
   _quantizer = new Quantizer(0);
   _oscQuantizer = new Quantizer(0);
   // initialize the oscillator
-  _oscillator = new Oscillator(_samplingRate);
+  _oscillator = new Oscillator();
   // re-initialize using the reset command (to keep things the same at start-up as on init)
   Reset();
 }
@@ -519,6 +517,9 @@ void CVOutput::SetAttack(int att, short format){
     tempSlew.Steps = (_envTarget - _current) / tempSlew.Delta;
     _slew = tempSlew;
   }
+  #ifdef DEBUG
+  Serial.printf("SetAttack: %d @ %ld\n", _attackSlew.Delta, _attackSlew.Steps);
+  #endif
 }
 
 /*
@@ -532,6 +533,9 @@ void CVOutput::SetDecay(int dec, short format){
     tempSlew.Steps = (_lOffset - _current) / tempSlew.Delta;
     _slew = tempSlew;
   }
+  #ifdef DEBUG
+  Serial.printf("SetDecay: %d @ %ld\n", _decaySlew.Delta, _decaySlew.Steps);
+  #endif
 }
 
 /*
@@ -679,9 +683,12 @@ void FASTRUN CVOutput::Update() {
       } else if (!_envelopeState) {
         // do the decay
         _envelopeActive = false;
+        // force current to _envTarget in case of SR dip
+        _current = _envTarget;
         _target = _lOffset;
         _slew = _decaySlew;
         _decaying = true;
+        _peakLED = true;
 
         // pulse the EOR trigger (if set)
         if (_envelopeMode && _triggerEOR)
@@ -773,9 +780,18 @@ void CVOutput::UpdateLED() {
   // update the LED if changed OR the frequency rate is < 1 Hz
   if (_updateLED || (_oscilMode && _oscillator->GetFrequency() <= 1)){
     _updateLED = false;
-    // calculate the LED value and update it
-    _ledHelper = _oscilMode ? abs(_cvHelper) >> 7 : abs(_current) >> 22;
+    // calculate the LED value and update it (and make sure you catch the envelope peak)
+    // if the envelope has peaked, make sure to show the peak value to appear more responsive
+    // (with its lower refresh rate, the LED usually misses the peak without this)
+    if (_peakLED) {
+      _ledHelper = abs(_envTarget) >> 22;
+      _peakLED = false;
+      _updateLED = true;
+    } else {
+      _ledHelper = _oscilMode ? abs(_cvHelper) >> 7 : abs(_current) >> 22;
+    }
     _ledHelper = constrain(_ledHelper, 0, 255);
+    // write the mapped LED value to the analog port
     analogWrite(_led, _ledMap[_ledHelper]);
   }
 }
@@ -799,8 +815,10 @@ SlewSteps CVOutput::CalculateRawSlew(long value, long target, long current){
     ret.Delta = target - current;
   } else {
     // caculate the slew increment value
-    ret.Steps = value * _krate;
+    ret.Steps = value * KRATE;
     ret.Delta = (target - current) / ret.Steps;
+    // increment one to have the last step be the signalling step
+    ret.Steps += 1;
   }
   return ret;
 }

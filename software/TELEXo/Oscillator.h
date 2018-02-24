@@ -12,9 +12,8 @@
 #define TABLERANGE 512
 #define TABLERANGEDIV2 256
 #define TABLESIZE 513
-#define TABLECOUNT 3
-#define WAVEFORMS 5
-#define MORPHRANGE 1000
+
+#define MORPHRANGE 100
 
 #define PHASEBITS 18
 #define TABLEBITS 9
@@ -28,7 +27,7 @@ class Oscillator
 {
   public:
   
-    Oscillator(int samplingRate);
+    Oscillator();
     float Oscillate();
     
     void SetFrequency(int freq);
@@ -54,16 +53,11 @@ class Oscillator
     void SetFreq(float freq);
     void TargetFreq(float freq);
 
-    static int *tables[TABLECOUNT];
-    static int peaks[WAVEFORMS];
-
-    static int table0[TABLESIZE];
-    static int table1[TABLESIZE];
-    static int table2[TABLESIZE];
-    
+    const int peaks[2] = { 128, 256 };
+  
   private:
 
-  uint8_t _wave = 0;
+  uint16_t _wave = 0;
   uint8_t _morphWave = 1;
   int _morph = 0;
   int _invMorph = MORPHRANGE;
@@ -85,10 +79,6 @@ class Oscillator
 
   int8_t _rectify = 0;
   bool _doRect = false;
-
-  int _samplingRate;
-  int _samplingRateDiv2;
-  int _krate;
 
   double _phasescale = 1.0 / ( 1 << REDUCEBITS );
 

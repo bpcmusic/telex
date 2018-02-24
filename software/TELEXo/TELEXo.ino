@@ -1,13 +1,11 @@
 /*
  * TELEXo Eurorack Module
- * (c) 2016, 2017 Brendon Cassidy
+ * (c) 2016-2018 Brendon Cassidy
  * MIT License
  */
 
-// debug flag turns on serial debugging over USB
-// this can drastically affect performance of the DAC
-// depending on where you output to serial - so take care when using it
-// #define DEBUG 1
+// defined globals shared across the app
+#include "defines.h"
 
 // i2c Wire Library (for Teensy)
 #include <i2c_t3.h>
@@ -24,15 +22,6 @@
 #include "TriggerOutput.h"
 #include "CVOutput.h"
 #include "TxHelper.h"
-
-// logging values
-#define WRITERATE 50.
-#define LEDINTERVAL 100
-#define LOGINTERVAL 10000
-
-// sampling rate and LED rate values
-#define SAMPLINGRATE 15625
-#define LEDRATE 50
 
 /*
  * Ugly Globals
@@ -53,12 +42,12 @@ int p = 0;
 // CV Outputs
 DAC dac(-1, 10, -1, 11, 13);
 int dacOutputs[] = { DAC_CHANNEL_D, DAC_CHANNEL_C, DAC_CHANNEL_B, DAC_CHANNEL_A };
-int pwmLedPins[] = { 3,4,5,6 };
+int pwmLedPins[] = { 3, 4, 5, 6 };
 CVOutput *cvOutputs[4];
 int writeRate = 100;
 
 // Trigger Outputs
-int trLedPins[] = { 0,1,2,7 };
+int trLedPins[] = { 0, 1, 2, 7 };
 int trPins[] = { 23, 22, 21, 20 };
 TriggerOutput *triggerOutputs[4];
 
@@ -114,7 +103,7 @@ void setup() {
   // set the behind-the-scenes LED output pin
   pinMode(LED, OUTPUT);
   // turn on serial
-  Serial.begin(9600);
+  Serial.begin(250000);
   // wait for debugging connection   
   while (!Serial);
   // kick off the logging
@@ -134,7 +123,7 @@ void setup() {
   for (i=0; i < 4; i++) {
     // set up the trigger and cv outputs
     triggerOutputs[i] = new TriggerOutput(trPins[i], trLedPins[i]);
-    cvOutputs[i] = new CVOutput(dacOutputs[i], pwmLedPins[i], dac, SAMPLINGRATE);
+    cvOutputs[i] = new CVOutput(dacOutputs[i], pwmLedPins[i], dac);
     cvOutputs[i]->ReferenceTriggers(triggerOutputs, sizeof(triggerOutputs));
   }
 
@@ -148,6 +137,7 @@ void setup() {
   // initialize the teensy optimized wire library
   Wire.begin(I2C_SLAVE, configID, I2C_PINS_18_19, enablePullups ? I2C_PULLUP_INT : I2C_PULLUP_EXT, I2C_RATE_400); // I2C_RATE_2400
   Wire.onReceive(receiveEvent);
+  
 }
 
 /*
