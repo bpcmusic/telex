@@ -21,6 +21,7 @@
 // 50 microseconds per millisecond - 1000 / 50
 
 struct SlewSteps {
+  long Duration = 0;
   int Steps = 0; 
   long Delta = 0;
 };

@@ -27,9 +27,9 @@
 
 // sampling rate and LED rate values
 #ifdef TURBO
-#define SAMPLINGRATE 24000
-#define SAMPLINGRATEDIV2 12000
-#define KRATE 24
+#define SAMPLINGRATE 25000
+#define SAMPLINGRATEDIV2 12500
+#define KRATE 25
 #else
 #define SAMPLINGRATE 15625
 #define SAMPLINGRATEDIV2 7812

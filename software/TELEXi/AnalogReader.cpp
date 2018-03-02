@@ -9,6 +9,8 @@
 
 #include <ResponsiveAnalogRead.h>
 
+#define MAXPOT 16379
+
 /*
  * simple constructor for unipolar things (like pots)
  */
@@ -23,8 +25,13 @@ AnalogReader::AnalogReader(int address, bool reverse){
   _address = address;
   _reverse = reverse;
   if (!_reverse) _bottom = 0;
-  
-  _analog = new ResponsiveAnalogRead(0, false);
+
+  // set the appropriate smoothing for CV (_reverse) and potentiometers
+  if (_reverse)
+    _analog = new ResponsiveAnalogRead(0, false);
+  else
+    _analog = new ResponsiveAnalogRead(0, true, .0001);
+    
   _analog->setAnalogResolution(1<<13);
   
   _calibrationData[0] = -16384;
@@ -37,9 +44,15 @@ AnalogReader::AnalogReader(int address, bool reverse){
  */
 int FASTRUN AnalogReader::Read() {
   // read the value from the pin
-  _readValue = analogRead(_address) >> 3;
+  _readValue = analogRead(_address);
   _analog->update(_readValue);
   _readValue = _analog->getValue();
+
+  // if it is a potentiometer (not reversed) constrain and scale to the MAXPOT range
+  if (!_reverse){
+    _readValue = constrain(_readValue, 0, MAXPOT);
+    _readValue = map(_readValue, 0, MAXPOT, 0, 16383);
+  }
 
   // shift it, flip it and reverse it (_reverse is for CV)
   _readValue = _readValue << (_reverse ? 2 : 1);
@@ -50,9 +63,7 @@ int FASTRUN AnalogReader::Read() {
 
   // map it (if we are mapping values)
   if (_map){
-    // Serial.printf("MAP %d",_readValue);
     _readValue = map(_readValue, _reverse ? BOTTOM : 0, TOP, _bottom, _top);
-    // Serial.printf(" = %d\n",_readValue);
   }
 
   // store as latest value and return
@@ -112,8 +123,6 @@ void AnalogReader::Calibrate(int measure){
     // flip and reverse
     value = value << (_reverse ? 2 : 1);
     if (_reverse) value = 16383 - value;
-
-    // Serial.printf("CALIB [%d][[%d]]: %d\n", _address, measure, value);
 
     // set the calibration data
     // removed value protections so that fun things can be done with scaling

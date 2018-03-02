@@ -89,8 +89,9 @@ void CVOutput::SetSlew(int value, short format){
  * Store a New Offset Value
  */
 void CVOutput::SetOffset(int value){
+
   // neutralize old offset and add new offset to target
-  _tempTarget = Constrain(((_envelopeActive ? _envTarget : _target) >> 15) - _offset + value) << 15;
+  _tempTarget = Constrain(((_envelopeMode ? _envTarget : _target) >> 15) + (value - _offset)) << 15;
   // store the new offset
   _offset = value;
   _lOffset = (_offset + _calibration) << 15;
@@ -98,18 +99,21 @@ void CVOutput::SetOffset(int value){
   if (_envelopeMode){
     if (_envTarget != _tempTarget) {
       _envTarget = _tempTarget;
+      _target = _lOffset;
       RecomputeEnvelopes();
     }
   } else {
-    // Serial.printf("target: %d; slew time: %d\n", _tempTarget, _slewTime);
     _target = _tempTarget;
-     // if slewing - calculate a new slew value; else set the offset directly
+  }
+
+  // only do this if the envelope isn't in the attack phase (_envelopeActive) or decaying (_decaying)  
+  if (!_envelopeActive && !_decaying){
+    // if slewing - calculate a new slew value; else set the offset directly
     if (_slewTime != 0) 
       CalculateSlewValue();
     else
       _set = true;
   }
-
 }
 
 /*
@@ -266,7 +270,7 @@ void CVOutput::SharedOscil(int value){
   if (!_oscilMode)
     _oscillator->ResetPhase(_target);
 
-  // determine if we are enterign oscil mode
+  // determine if we are entering oscil mode
   _oscilMode = value > 0;
 
   // setup oscillation conditions or turn them off
@@ -517,9 +521,6 @@ void CVOutput::SetAttack(int att, short format){
     tempSlew.Steps = (_envTarget - _current) / tempSlew.Delta;
     _slew = tempSlew;
   }
-  #ifdef DEBUG
-  Serial.printf("SetAttack: %d @ %ld\n", _attackSlew.Delta, _attackSlew.Steps);
-  #endif
 }
 
 /*
@@ -533,9 +534,6 @@ void CVOutput::SetDecay(int dec, short format){
     tempSlew.Steps = (_lOffset - _current) / tempSlew.Delta;
     _slew = tempSlew;
   }
-  #ifdef DEBUG
-  Serial.printf("SetDecay: %d @ %ld\n", _decaySlew.Delta, _decaySlew.Steps);
-  #endif
 }
 
 /*
@@ -572,17 +570,25 @@ void CVOutput::SetEnvelopeMode(int mode){
  * Recomputes the Envlope Values
  */
 void CVOutput::RecomputeEnvelopes(){
-  _attackSlew = CalculateRawSlew(_attack, _envTarget, _lOffset);
-  _decaySlew = CalculateRawSlew(_decay, _lOffset, _envTarget);
-  if (!_envelopeActive && _decaying){
-    SlewSteps tempSlew = CalculateRawSlew(_decay, _lOffset, _envTarget);
-    tempSlew.Steps = (_lOffset - _current) / tempSlew.Delta;
-    _slew = tempSlew;
-  } else if (_envelopeActive && !_decaying) {
-    SlewSteps tempSlew = CalculateRawSlew(_attack, _envTarget, _lOffset);
-    tempSlew.Steps = (_envTarget - _current) / tempSlew.Delta;
+  
+  // calculate the interim slew if the envelope is currently active
+  // the envelope will adjust its pace to meet the new peak or resting value
+  // appropriate to the current phase
+  if(_decaying){
+    // envelope is in the decay phase
+    unsigned long remaining = ((float)_slew.Steps / _decaySlew.Steps) * _decay;
+    SlewSteps tempSlew = CalculateRawSlew(remaining, _lOffset, _current);
+    _slew = tempSlew;     
+  } else if (_envelopeActive) {
+    // envelope is in the attack phase
+    unsigned long remaining = ((float)_slew.Steps / _attackSlew.Steps) * _attack;
+    SlewSteps tempSlew = CalculateRawSlew(remaining, _envTarget, _current);
     _slew = tempSlew;
   }
+
+  
+  _attackSlew = CalculateRawSlew(_attack, _envTarget, _lOffset);
+  _decaySlew = CalculateRawSlew(_decay, _lOffset, _envTarget);
 }
 
 /*
@@ -808,6 +814,7 @@ void CVOutput::CalculateSlewValue(){
  */
 SlewSteps CVOutput::CalculateRawSlew(long value, long target, long current){
   SlewSteps ret;
+  ret.Duration = value;
   // split here so we don't divide by zero
   if (value == 0 || target == current){
     // if slew is zero - we just set the slew increment to the value we want to traverse

@@ -79,8 +79,7 @@ void setup() {
   configID += cfg;  
 
   // TELEXi uses the standard Teensy analog inputs which have 13 bit usable resolution
-  // will return 16 - but it is filled with noise in the latter bits (as opposed to zeros)
-  analogReadResolution(16);
+  analogReadResolution(13);
 
   // debugging nonsense
 #ifdef DEBUG
