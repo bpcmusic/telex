@@ -53,6 +53,8 @@ class Oscillator
     void SetFreq(float freq);
     void TargetFreq(float freq);
 
+    double PolyBlep(double t);
+
     const int peaks[2] = { 128, 256 };
   
   private:
@@ -76,6 +78,7 @@ class Oscillator
   
   float _lastValue;
   int _width = TABLERANGEDIV2;
+  float _fWidth = .5;
 
   int8_t _rectify = 0;
   bool _doRect = false;
@@ -89,6 +92,12 @@ class Oscillator
   unsigned long _delta = 0;
   bool _portamento = false;
   bool _sign = true;
+
+  // polyblep
+  double _pbPhaseIncrement = 0;
+  double _pbCurrentPhase = 0;
+  bool _pbRecalcPI = false;
+  bool _blepIt = false;
   
 };
 

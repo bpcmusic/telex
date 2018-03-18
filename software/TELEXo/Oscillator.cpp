@@ -38,8 +38,8 @@ float Oscillator::Oscillate() {
   _location = _actualPhase >> REDUCEBITS;
 
   // optimized to chained if statements
-  if (_wave == 3) {
-    _lastValue =  _location < _width ? -32767 : 32767;
+  if (_wave == SQUARE_WAVE) {
+    _lastValue =  _location < _width ? -32767 : 32767;    
   } else if (_wave < WAVETABLECOUNT) {
     #ifdef BASIC
     if (_portamento || _morphing || _doRect){
@@ -60,6 +60,30 @@ float Oscillator::Oscillate() {
   } else {
     _lastValue =  0;
   }
+
+  #ifdef TURBO
+  // polyblep for primitive waves (saw, square, triangle)
+  if (_blepIt && (_wave == SQUARE_WAVE || _wave == SAW_WAVE)){
+    if (_pbRecalcPI){
+      _pbPhaseIncrement = (double)_ulstep / FULLPHASE;
+      _pbRecalcPI = _portamento;
+    }
+    
+    _pbCurrentPhase = (double)_actualPhase / FULLPHASE;
+
+    if (_wave == SAW_WAVE){
+      _lastValue -= PolyBlep(_pbCurrentPhase) * 32767;
+ /*     
+    } else if (_wave == TRIANGLE_WAVE) {
+      _lastValue += PolyBlep(fmod(_pbCurrentPhase, 1.0)) * 32767;
+      _lastValue -= PolyBlep(fmod(_pbCurrentPhase + .5, 1.0)) * 32767;
+ */     
+    } else {
+      _lastValue -= PolyBlep(_pbCurrentPhase) * 32767;
+      _lastValue += PolyBlep(fmod(_pbCurrentPhase + _fWidth, 1.0)) * 32767;
+    }
+  }
+  #endif
 
   // optimized by moving to chained if statements
   if (_morphing){
@@ -105,6 +129,7 @@ void Oscillator::SetFreq(float freq){
   _frequency = freq;
   _portamento = false;
   _ulstep = (int)((freq / SAMPLINGRATE) * FULLPHASE);
+  _pbRecalcPI = true;
 }
 
 /*
@@ -125,6 +150,7 @@ void Oscillator::TargetFreq(float freq){
     }
     _steps = _stepsCalculated;
     _portamento = true;
+    _pbRecalcPI = true;
   }
 }
 
@@ -182,7 +208,9 @@ void Oscillator::TargetLFO(int millihertz) {
  */
 void Oscillator::SetWidth(int width) {
   width = constrain(width, 0, 100);
-  _width = ((float)width / 100.) * (TABLERANGE - 1);
+  _fWidth = (float)width / 100.;
+  _width = _fWidth * (TABLERANGE - 1);
+  
 }
 
 /*
@@ -194,6 +222,12 @@ void Oscillator::SetWidth(int width) {
  * +2 - full positive rectification ((abs)value)
  */
 void Oscillator::SetRectify(int mode) {
+
+  if (mode == 5){ 
+    _blepIt = !_blepIt;
+    return;
+  }
+  
   _rectify = constrain(mode, -2, 2);
   _doRect = _rectify != 0;
 }
@@ -257,3 +291,23 @@ float Oscillator::GetFrequency(){
   return _frequency;
 }
 
+/*
+ * PolyBLEP by Tale (slightly modified)
+ * http://www.kvraudio.com/forum/viewtopic.php?t=375517
+ * http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/
+ * http://research.spa.aalto.fi/publications/papers/smc2010-phaseshaping/phaseshapers.py
+*/ 
+double Oscillator::PolyBlep(double t){
+    // 0 <= t < 1
+    if (t < _pbPhaseIncrement) {
+        t /= _pbPhaseIncrement;
+        return t+t - t*t - 1.0;
+    }
+    // -1 < t < 0
+    else if (t > 1.0 - _pbPhaseIncrement) {
+        t = (t - 1.0) / _pbPhaseIncrement;
+        return t*t + t+t + 1.0;
+    }
+    // 0 otherwise
+    else return 0.0;
+}
