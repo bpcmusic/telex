@@ -38,8 +38,9 @@ float Oscillator::Oscillate() {
   _location = _actualPhase >> REDUCEBITS;
 
   // optimized to chained if statements
-  if (_wave == 3) {
-    _lastValue =  _location < _width ? -32767 : 32767;
+  if (_wave == SQUARE_WAVE) {
+    // _lastValue =  _location < _width ? -32767 : 32767;    
+    _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
   } else if (_wave < WAVETABLECOUNT) {
     #ifdef BASIC
     if (_portamento || _morphing || _doRect){
@@ -60,6 +61,21 @@ float Oscillator::Oscillate() {
   } else {
     _lastValue =  0;
   }
+
+  #ifdef TURBO
+  // polyblep for primitive waves (saw and square)
+  // set a 20k and above threshold for applying it (
+  if (_ulstep >= FQ20K && (_wave == SQUARE_WAVE || _wave == SAW_WAVE)){
+    
+    if (_wave == SAW_WAVE){
+      _lastValue -= PolyBlepFixed(_actualPhase);   
+    } else {
+      _lastValue -= PolyBlepFixed(_actualPhase);
+      _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);
+    }
+   
+  }
+  #endif
 
   // optimized by moving to chained if statements
   if (_morphing){
@@ -105,6 +121,9 @@ void Oscillator::SetFreq(float freq){
   _frequency = freq;
   _portamento = false;
   _ulstep = (int)((freq / SAMPLINGRATE) * FULLPHASE);
+  #ifdef DEBUG
+  Serial.printf("FQ: %f - %lu\n", freq, _ulstep); 
+  #endif
 }
 
 /*
@@ -182,7 +201,14 @@ void Oscillator::TargetLFO(int millihertz) {
  */
 void Oscillator::SetWidth(int width) {
   width = constrain(width, 0, 100);
-  _width = ((float)width / 100.) * (TABLERANGE - 1);
+  _fWidth = (float)width / 100.;
+  _ulWidth = _fWidth * (FULLPHASE - 1);
+  _width = _fWidth * (TABLERANGE - 1);
+
+  #ifdef DEBUG
+  Serial.printf("width: %d; _fWidth: %f; _ulWidth: %lu; _width: %d\n",width, _fWidth, _ulWidth, _width);
+  #endif
+  
 }
 
 /*
@@ -257,3 +283,23 @@ float Oscillator::GetFrequency(){
   return _frequency;
 }
 
+/*
+ * PolyBLEP by Tale (slightly modified several times)
+ * http://www.kvraudio.com/forum/viewtopic.php?t=375517
+ * http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/
+ * http://research.spa.aalto.fi/publications/papers/smc2010-phaseshaping/phaseshapers.py
+*/ 
+double Oscillator::PolyBlepFixed(unsigned long ulT){
+    // 0 <= t < 1
+    if (ulT < _ulstep) {
+        t = (double)ulT / _ulstep;
+        return (t+t - t*t - 1.0) * 32767;
+    }
+    // -1 < t < 0
+    else if (ulT > FULLPHASE - _ulstep) {
+        t = ((double)ulT - FULLPHASE) / _ulstep;
+        return (t*t + t+t + 1.0) * 32767;
+    }
+    // 0 otherwise
+    else return 0.0;
+}

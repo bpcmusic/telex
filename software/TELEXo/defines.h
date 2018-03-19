@@ -30,6 +30,8 @@
 #define SAMPLINGRATE 25000
 #define SAMPLINGRATEDIV2 12500
 #define KRATE 25
+// ulstep for 20k (for polyblep threshold)
+#define FQ20K 3435973
 #else
 #define SAMPLINGRATE 15625
 #define SAMPLINGRATEDIV2 7812

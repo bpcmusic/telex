@@ -22,6 +22,7 @@
 // #define PHASESCALE = 1.1920928955078125e-7 // 1.0 / ( 1 << REDUCEBITS )
 
 #define FULLPHASE 4294967296.
+#define FULLPHASEL 4294967295
 
 class Oscillator
 {
@@ -53,6 +54,8 @@ class Oscillator
     void SetFreq(float freq);
     void TargetFreq(float freq);
 
+    double PolyBlepFixed(unsigned long ulT);
+
     const int peaks[2] = { 128, 256 };
   
   private:
@@ -76,6 +79,8 @@ class Oscillator
   
   float _lastValue;
   int _width = TABLERANGEDIV2;
+  float _fWidth = .5;
+  unsigned long _ulWidth = FULLPHASEL >> 1;
 
   int8_t _rectify = 0;
   bool _doRect = false;
@@ -89,7 +94,10 @@ class Oscillator
   unsigned long _delta = 0;
   bool _portamento = false;
   bool _sign = true;
-  
+
+  // polyblep
+  double t = 0.0;
+
 };
 
 #endif
