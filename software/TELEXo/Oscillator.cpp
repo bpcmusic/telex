@@ -40,8 +40,14 @@ float Oscillator::Oscillate() {
   // optimized to chained if statements
   if (_wave == SQUARE_WAVE) { 
     _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
+  #ifdef TURBO
+  // do actual calculations when we have the CPU
   } else if (_wave == SAW_WAVE) {  
-    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767;  
+    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767; 
+  } else if (_wave == TRIANGLE_WAVE) {  
+    _lastValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
+  #endif 
+  // fall back on the table if we don't have the CPU to spare
   } else if (_wave < WAVETABLECOUNT) {
     #ifdef BASIC
     if (_portamento || _morphing || _doRect){
