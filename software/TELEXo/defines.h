@@ -11,7 +11,7 @@
 // debug flag turns on serial debugging over USB
 // this can drastically affect performance of the DAC
 // depending on where you output to serial - so take care when using it
-// #define DEBUG 1
+#define DEBUG 1
 
 // identify if the teensy 3.6 is being used (TURBO) or it is a 3.2 (BASIC)
 #if defined(__MK66FX1M0__)
@@ -30,6 +30,8 @@
 #define SAMPLINGRATE 25000
 #define SAMPLINGRATEDIV2 12500
 #define KRATE 25
+// ulstep for 20k (for polyblep threshold)
+#define FQ20K 3435973
 #else
 #define SAMPLINGRATE 15625
 #define SAMPLINGRATEDIV2 7812
