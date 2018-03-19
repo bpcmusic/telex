@@ -41,10 +41,19 @@ float Oscillator::Oscillate() {
   if (_wave == SQUARE_WAVE) { 
     _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
   #ifdef TURBO
-  // do actual calculations when we have the CPU
+    // polyblep frequencies above 20k
+    if (_ulstep >= FQ20K){
+      _lastValue -= PolyBlepFixed(_actualPhase);
+      _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);     
+    }
   } else if (_wave == SAW_WAVE) {  
-    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767; 
-  } else if (_wave == TRIANGLE_WAVE) {  
+    // do actual calculations when we have the CPU
+    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767;
+    // polyblep frequencies above 20k
+    if (_ulstep >= FQ20K)
+      _lastValue -= PolyBlepFixed(_actualPhase);      
+  } else if (_wave == TRIANGLE_WAVE) { 
+    // do actual calculations when we have the CPU 
     _lastValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
   #endif 
   // fall back on the table if we don't have the CPU to spare
@@ -69,23 +78,30 @@ float Oscillator::Oscillate() {
     _lastValue =  0;
   }
 
-  #ifdef TURBO
-  // polyblep for primitive waves (saw and square)
-  // set a 20k and above threshold for applying it
-  if (_ulstep >= FQ20K && (_wave == SQUARE_WAVE || _wave == SAW_WAVE)){
-    if (_wave == SAW_WAVE){
-      _lastValue -= PolyBlepFixed(_actualPhase);   
-    } else {
-      _lastValue -= PolyBlepFixed(_actualPhase);
-      _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);
-    }
-  }
-  #endif
-
   // optimized by moving to chained if statements
   if (_morphing){
     if (_morphWave == 3) {
-      _morphValue =  _location < _width ? -32767 : 32767;
+  
+      _morphValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
+    #ifdef TURBO
+      // polyblep frequencies above 20k
+      if (_ulstep >= FQ20K){
+        _morphValue -= PolyBlepFixed(_actualPhase);
+        _morphValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);     
+      }
+    } else if (_morphWave == SAW_WAVE) {  
+      // do actual calculations when we have the CPU
+      _morphValue = (_actualPhase * SAW_INCREMENT) - 32767;
+      // polyblep frequencies above 20k
+      if (_ulstep >= FQ20K)
+        _morphValue -= PolyBlepFixed(_actualPhase);      
+    } else if (_morphWave == TRIANGLE_WAVE) { 
+      // do actual calculations when we have the CPU 
+      _morphValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
+    #endif 
+    // fall back on the table if we don't have the CPU to spare
+
+
     } else if (_morphWave < WAVETABLECOUNT){
       #ifdef BASIC
       _morphValue =  wavetables[_morphWave][_location];
