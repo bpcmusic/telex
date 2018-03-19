@@ -66,27 +66,14 @@ float Oscillator::Oscillate() {
   // polyblep for primitive waves (saw and square)
   // set a 20k and above threshold for applying it (
   if (_ulstep >= FQ20K && (_wave == SQUARE_WAVE || _wave == SAW_WAVE)){
-    if (_pbRecalcPI){
-      _pbPhaseIncrement = (double)_ulstep / FULLPHASE;
-      _pbRecalcPI = _portamento;
-    }
     
-    _pbCurrentPhase = (double)_actualPhase / FULLPHASE;
-/*
     if (_wave == SAW_WAVE){
-      _lastValue -= PolyBlep(_pbCurrentPhase, _actualPhase);   
+      _lastValue -= PolyBlepFixed(_actualPhase);   
     } else {
-      _lastValue -= PolyBlep(_pbCurrentPhase, _actualPhase);
-      _lastValue += PolyBlep(fmod(_pbCurrentPhase + _fWidth, 1.0), _ulWidth + _actualPhase);
+      _lastValue -= PolyBlepFixed(_actualPhase);
+      _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);
     }
-*/   
-    if (_wave == SAW_WAVE){
-      _lastValue -= _blepIt ? PolyBlepFixed(_pbCurrentPhase, _actualPhase) : PolyBlep(_pbCurrentPhase);   
-    } else {
-      _lastValue -= _blepIt ? PolyBlepFixed(_pbCurrentPhase, _actualPhase) : PolyBlep(_pbCurrentPhase);   
-      _lastValue += _blepIt ? PolyBlepFixed(_pbCurrentPhase, (FULLPHASEL - _ulWidth + 1) + _actualPhase, true) : PolyBlep(fmod((1-_pbCurrentPhase) + _fWidth, 1.0));
-    }
-    
+   
   }
   #endif
 
@@ -134,7 +121,6 @@ void Oscillator::SetFreq(float freq){
   _frequency = freq;
   _portamento = false;
   _ulstep = (int)((freq / SAMPLINGRATE) * FULLPHASE);
-  _pbRecalcPI = true;
   #ifdef DEBUG
   Serial.printf("FQ: %f - %lu\n", freq, _ulstep); 
   #endif
@@ -158,7 +144,6 @@ void Oscillator::TargetFreq(float freq){
     }
     _steps = _stepsCalculated;
     _portamento = true;
-    _pbRecalcPI = true;
   }
 }
 
@@ -235,12 +220,6 @@ void Oscillator::SetWidth(int width) {
  * +2 - full positive rectification ((abs)value)
  */
 void Oscillator::SetRectify(int mode) {
-
-  if (mode == 5){ 
-    _blepIt = !_blepIt;
-    return;
-  }
-  
   _rectify = constrain(mode, -2, 2);
   _doRect = _rectify != 0;
 }
@@ -310,50 +289,17 @@ float Oscillator::GetFrequency(){
  * http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/
  * http://research.spa.aalto.fi/publications/papers/smc2010-phaseshaping/phaseshapers.py
 */ 
-double Oscillator::PolyBlep(double t){
-    // 0 <= t < 1
-    if (t < _pbPhaseIncrement) {
-        t /= _pbPhaseIncrement;
-        return (t+t - t*t - 1.0) * 32767;
-    }
-    // -1 < t < 0
-    else if (t > 1.0 - _pbPhaseIncrement) {
-        t = (t - 1.0) / _pbPhaseIncrement;
-        return (t*t + t+t + 1.0) * 32767;
-    }
-    // 0 otherwise
-    else return 0.0;
-}
-/*
- * PolyBLEP by Tale (slightly modified several times)
- * http://www.kvraudio.com/forum/viewtopic.php?t=375517
- * http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/
- * http://research.spa.aalto.fi/publications/papers/smc2010-phaseshaping/phaseshapers.py
-*/ 
-double Oscillator::PolyBlepFixed(double t, unsigned long ulT, bool logIt){
+double Oscillator::PolyBlepFixed(unsigned long ulT){
     // 0 <= t < 1
     if (ulT < _ulstep) {
-        #ifdef DEBUG
-        if (millis() > _nextLog){
-          Serial.printf("_actualPhase: %lu; _ulstep: %lu; ulT: %lu;\n", _actualPhase, _ulstep, ulT);
-          Serial.printf("t: %f; _pbPhaseIncrement: %f;\n", t, _pbPhaseIncrement);
-          if (_errorPuppy++ >= 1) {
-            _nextLog = millis() + 10000;
-            _errorPuppy = 0;
-          }
-        }
-        #endif
-        // t /= _pbPhaseIncrement;
         t = (double)ulT / _ulstep;
         return (t+t - t*t - 1.0) * 32767;
     }
     // -1 < t < 0
     else if (ulT > FULLPHASE - _ulstep) {
-        // t = (t - 1.0) / _pbPhaseIncrement;
         t = ((double)ulT - FULLPHASE) / _ulstep;
         return (t*t + t+t + 1.0) * 32767;
     }
     // 0 otherwise
     else return 0.0;
 }
-double Oscillator::PolyBlepFixed(double t, unsigned long ulT) { return PolyBlepFixed(t, ulT, false); }

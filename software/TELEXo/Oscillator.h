@@ -54,9 +54,7 @@ class Oscillator
     void SetFreq(float freq);
     void TargetFreq(float freq);
 
-    double PolyBlep(double t);
-    double PolyBlepFixed(double t, unsigned long ulT);
-    double PolyBlepFixed(double t, unsigned long ulT, bool logIt);
+    double PolyBlepFixed(unsigned long ulT);
 
     const int peaks[2] = { 128, 256 };
   
@@ -98,13 +96,8 @@ class Oscillator
   bool _sign = true;
 
   // polyblep
-  double _pbPhaseIncrement = 0;
-  double _pbCurrentPhase = 0;
-  bool _pbRecalcPI = false;
-  bool _blepIt = false;
+  double t = 0.0;
 
-  unsigned long _nextLog = 0;
-  int _errorPuppy = 0;
 };
 
 #endif
