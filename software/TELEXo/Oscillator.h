@@ -24,6 +24,8 @@
 #define FULLPHASE 4294967296.
 #define FULLPHASEL 4294967295
 
+#define SAW_INCREMENT 0.000015258323401212692
+
 class Oscillator
 {
   public:

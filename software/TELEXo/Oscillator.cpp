@@ -38,9 +38,10 @@ float Oscillator::Oscillate() {
   _location = _actualPhase >> REDUCEBITS;
 
   // optimized to chained if statements
-  if (_wave == SQUARE_WAVE) {
-    // _lastValue =  _location < _width ? -32767 : 32767;    
+  if (_wave == SQUARE_WAVE) { 
     _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
+  } else if (_wave == SAW_WAVE) {  
+    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767;  
   } else if (_wave < WAVETABLECOUNT) {
     #ifdef BASIC
     if (_portamento || _morphing || _doRect){
@@ -64,16 +65,14 @@ float Oscillator::Oscillate() {
 
   #ifdef TURBO
   // polyblep for primitive waves (saw and square)
-  // set a 20k and above threshold for applying it (
+  // set a 20k and above threshold for applying it
   if (_ulstep >= FQ20K && (_wave == SQUARE_WAVE || _wave == SAW_WAVE)){
-    
     if (_wave == SAW_WAVE){
       _lastValue -= PolyBlepFixed(_actualPhase);   
     } else {
       _lastValue -= PolyBlepFixed(_actualPhase);
       _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);
     }
-   
   }
   #endif
 
