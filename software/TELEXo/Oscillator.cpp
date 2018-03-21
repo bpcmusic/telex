@@ -37,21 +37,30 @@ float Oscillator::Oscillate() {
   // reduce this down to meet the tablesize range
   _location = _actualPhase >> REDUCEBITS;
 
+  // too expensive to do this for the primary and morphing waveforms -
+  // we do the PolyBlep calculations once for both
+  if (_blepItOne){
+    _blepOne = PolyBlepFixed(_actualPhase);
+    if (_blepItTwo){
+      _blepTwo = PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);
+    }
+  }
+
   // optimized to chained if statements
   if (_wave == SQUARE_WAVE) { 
     _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
   #ifdef TURBO
     // polyblep frequencies above 20k
     if (_ulstep >= FQ20K){
-      _lastValue -= PolyBlepFixed(_actualPhase);
-      _lastValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);     
+      _lastValue -= _blepOne;
+      _lastValue += _blepTwo;     
     }
   } else if (_wave == SAW_WAVE) {  
     // do actual calculations when we have the CPU
     _lastValue = (_actualPhase * SAW_INCREMENT) - 32767;
     // polyblep frequencies above 20k
     if (_ulstep >= FQ20K)
-      _lastValue -= PolyBlepFixed(_actualPhase);      
+      _lastValue -= _blepOne;      
   } else if (_wave == TRIANGLE_WAVE) { 
     // do actual calculations when we have the CPU 
     _lastValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
@@ -86,15 +95,15 @@ float Oscillator::Oscillate() {
     #ifdef TURBO
       // polyblep frequencies above 20k
       if (_ulstep >= FQ20K){
-        _morphValue -= PolyBlepFixed(_actualPhase);
-        _morphValue += PolyBlepFixed((FULLPHASEL - _ulWidth + 1) + _actualPhase);     
+        _morphValue -= _blepOne;
+        _morphValue += _blepTwo;     
       }
     } else if (_morphWave == SAW_WAVE) {  
       // do actual calculations when we have the CPU
       _morphValue = (_actualPhase * SAW_INCREMENT) - 32767;
       // polyblep frequencies above 20k
       if (_ulstep >= FQ20K)
-        _morphValue -= PolyBlepFixed(_actualPhase);      
+        _morphValue -= _blepOne;      
     } else if (_morphWave == TRIANGLE_WAVE) { 
       // do actual calculations when we have the CPU 
       _morphValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
@@ -258,6 +267,18 @@ void Oscillator::SetWaveform(int wave) {
   _morph = wave % MORPHRANGE;
   _invMorph = MORPHRANGE - _morph;
   _morphing = _morph != 0;
+
+  if (_wave == SAW_WAVE || _morphWave == SAW_WAVE){
+    _blepItOne = true;
+    if (_wave == SQUARE_WAVE || _morphWave == SQUARE_WAVE) {
+      _blepItTwo = true;
+    } else {
+      _blepItTwo = false;
+    }
+  } else {
+    _blepItOne = false;
+    _blepItTwo = false;
+  }
 }
 
 /*

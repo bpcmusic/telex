@@ -101,6 +101,10 @@ class Oscillator
 
   // polyblep
   double t = 0.0;
+  bool _blepItOne = false;
+  bool _blepItTwo = false;
+  int _blepOne = 0.0;
+  int _blepTwo = 0.0;
 
 };
 
