@@ -48,22 +48,24 @@ float Oscillator::Oscillate() {
 
   // optimized to chained if statements
   if (_wave == SQUARE_WAVE) { 
-    _lastValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
+    _lastValue =  _actualPhase & 0x80000000 ? 32767 : -32767;    
   #ifdef TURBO
     // polyblep frequencies above 20k
     if (_ulstep >= FQ20K){
       _lastValue -= _blepOne;
       _lastValue += _blepTwo;     
     }
+  #endif
   } else if (_wave == SAW_WAVE) {  
     // do actual calculations when we have the CPU
-    _lastValue = (_actualPhase * SAW_INCREMENT) - 32767;
+    _lastValue = (int)(_actualPhase >> 16) - 32767;
+  #ifdef TURBO
     // polyblep frequencies above 20k
     if (_ulstep >= FQ20K)
       _lastValue -= _blepOne;      
   } else if (_wave == TRIANGLE_WAVE) { 
-    // do actual calculations when we have the CPU 
-    _lastValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
+    // do actual calculations when we have the CPU  
+    _lastValue = _actualPhase & 0x80000000 ? (int)((FULLPHASEL - _actualPhase) >> 15) - 32767 : (int)(_actualPhase >> 15) - 32767;
   #endif 
   // fall back on the table if we don't have the CPU to spare
   } else if (_wave < WAVETABLECOUNT) {
@@ -90,27 +92,26 @@ float Oscillator::Oscillate() {
   // optimized by moving to chained if statements
   if (_morphing){
     if (_morphWave == 3) {
-  
-      _morphValue =  _actualPhase < _ulWidth ? -32767 : 32767;    
+      _morphValue =  _actualPhase & 0x80000000 ? 32767 : -32767;   
     #ifdef TURBO
       // polyblep frequencies above 20k
       if (_ulstep >= FQ20K){
         _morphValue -= _blepOne;
         _morphValue += _blepTwo;     
       }
-    } else if (_morphWave == SAW_WAVE) {  
+    #endif
+    } else if (_wave == SAW_WAVE) {  
       // do actual calculations when we have the CPU
-      _morphValue = (_actualPhase * SAW_INCREMENT) - 32767;
+      _morphValue = (int)(_actualPhase >> 16) - 32767;
+    #ifdef TURBO
       // polyblep frequencies above 20k
       if (_ulstep >= FQ20K)
         _morphValue -= _blepOne;      
     } else if (_morphWave == TRIANGLE_WAVE) { 
       // do actual calculations when we have the CPU 
-      _morphValue =  _actualPhase < HALFPHASE ? (_actualPhase * TRIANGLE_INCREMENT) - 32767: ((FULLPHASEL - _actualPhase) * TRIANGLE_INCREMENT) - 32767;   
+      _morphValue =  _actualPhase & 0x80000000 ? (int)((FULLPHASEL - _actualPhase) >> 15) - 32767 : (int)(_actualPhase >> 15) - 32767 ;  
     #endif 
     // fall back on the table if we don't have the CPU to spare
-
-
     } else if (_morphWave < WAVETABLECOUNT){
       #ifdef BASIC
       _morphValue =  wavetables[_morphWave][_location];

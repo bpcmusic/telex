@@ -25,9 +25,6 @@
 #define FULLPHASEL 4294967295
 #define HALFPHASE 2147483648
 
-#define SAW_INCREMENT 0.000015258556231856346
-#define TRIANGLE_INCREMENT 0.000030517112463712692
-
 class Oscillator
 {
   public:
@@ -81,7 +78,8 @@ class Oscillator
   int _location;
   float _remainder;
   
-  float _lastValue;
+  int _lastValue;
+  
   int _width = TABLERANGEDIV2;
   float _fWidth = .5;
   unsigned long _ulWidth = FULLPHASEL >> 1;
