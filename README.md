@@ -58,7 +58,7 @@ Compiling the TELEX firmware is done using the [Arduino Development Environment]
 
 Several additional libraries are included in the project due to the Arduino IDE's wonderful linking capabilities.
 
-	IMPORTANT: overclock your Teensy to 120 MHz in the IDE
+	IMPORTANT: overclock your Teensy 3.2 to 120 MHz in the IDE; Teensy 3.6 should be at 180 MHz
 
 
 ### Critical Startup Optimization for Compilation
@@ -67,7 +67,19 @@ If you want your TELEX to be ready when your Teletype has booted and is sending 
 
 `Contents\Java\hardware\teensy\avr\cores\teensy3\pins_teensy.c`
 
-Line 585 has the value `delay(400)`; reduce this to an amount of delay that is appropriate for you needed startup time. For the official firmware, we set this to `delay(175)` which should be more than enough to beat the fast-loading, 2.0 firmware to the ready.
+You need to change the values in the delay() calls - the original values are commented off to the right:
+
+```
+#if TEENSYDUINO >= 142
+	delay(25);
+	usb_init();
+	delay(150); // 275
+#else
+	delay(50);
+	usb_init();
+	delay(125); // 350
+#endif
+```
 
 For now, we edit this in-place. I know. We shuddered too. But, that seems to be the best way to make the change. Remember, you need to change it back for any other Arduino compilation you plan to do as it may have the device ready before all of your related components are - including the Teensy's USB interface.
 
