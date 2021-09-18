@@ -48,7 +48,7 @@ float Oscillator::Oscillate() {
 
   // optimized to chained if statements
   if (_wave == SQUARE_WAVE) { 
-    _lastValue =  _actualPhase & 0x80000000 ? 32767 : -32767;    
+    _lastValue =  _actualPhase < _ulWidth ? 32767 : -32767;    
   #ifdef TURBO
     // polyblep frequencies above 20k
     if (_ulstep >= FQ20K){

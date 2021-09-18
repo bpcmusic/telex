@@ -62,7 +62,9 @@ Several additional libraries are included in the project due to the Arduino IDE'
 
 
 ### Critical Startup Optimization for Compilation
-	
+
+> NOTE: this keeps changing in the Teensyduino application. I'm not finding this necessary anymore, but am leaving the old instructions in case anyone wants to fuss around with it. You can ignore for now.
+
 If you want your TELEX to be ready when your Teletype has booted and is sending out the `I` script for the program that it is loading at startup, you need to make a change to the Teensy file "pins_teensy.c" in your Arduino hardware folder. For my mac, this is inside of the Arduino application package in:
 
 `Contents\Java\hardware\teensy\avr\cores\teensy3\pins_teensy.c`
@@ -244,7 +246,7 @@ There are also MULTI files for three of the dual-sided boards that will help you
 
 * Tom Whitwell of [Music Thing Modular](http://musicthing.co.uk/modular/) and his open sharing of the Teensy 3.1 powered, Bad-Assed [RadioMusic](https://github.com/TomWhitwell/RadioMusic/wiki).
 
-* Olivier Gillet at [Mutable Instruments](http://mutable-instruments.net/) for his fantastic modules, excellent design, impressive implementation skills and commitment to open hardware. 
+* Émilie Gillet at [Mutable Instruments](http://mutable-instruments.net/) for her fantastic modules, excellent design, impressive implementation skills and commitment to open hardware. 
 
 * Jim Matheson of Neutron Sound and his fantastic Teensy 3.1 powered [Orgone Accumulator](http://neutron-sound.com/noa.html).
 
