@@ -1,6 +1,6 @@
 # TELEX Command Reference
 
-This document outlines the commands for the open source Teletype Expanders TELEXo and TELEXi. You can also use this [Printable Command Reference](extras/TELEX Command Reference.pdf).
+This document outlines the commands for the open source Teletype Expanders TELEXo and TELEXi. You can also use this [Printable Command Reference](extras/TELEX%20Command%20Reference.pdf).
 
 #### Changelog
 
