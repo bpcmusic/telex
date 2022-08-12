@@ -45,7 +45,7 @@ Firmware is loaded on the Teensy processor that piggybacks on the underside of y
 4. Connect the Teensy to your computer via USB
 5. Use your operating system specific instructions for the Teensy Loader to open the appropriate firmware in the Teensy loader and program it on your Teensy
 6. Disconnect the Teensy from USB when the firmware has been loaded
-7. Reattach the Teensy to your module if you removed it
+7. Reattach the Teensy to your module if you removed it (USB port on the Teensy goes towards the top of the PCB)
 8. Party.
 
 ### Compiling Your Own Firmware
